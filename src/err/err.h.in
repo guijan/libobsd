@@ -17,7 +17,9 @@
 #if !defined(H_OBSD_ERR)
 #define H_OBSD_ERR
 
+#if @err_h@
 #include_next <err.h>
+#endif
 
 #if @verr@ || @verrc@ || @verrx@ || @vwarn@ || @vwarnc@ || @vwarnx@
 #include <stdarg.h>

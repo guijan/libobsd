@@ -21,7 +21,6 @@
 stdlib = {
   'arc4random': ['arc4random.c', 'arc4random.3'],
   'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
-  'getprogname': ['getprogname.c', 'getprogname.3'],
   'strtonum': ['strtonum.c', 'arc4random.3'],
 }
 
@@ -30,17 +29,51 @@ foreach func, info : stdlib
   stdlib += {func: stdlib[func] + [not cc.has_function(func)]}
 endforeach
 
+if not cc.has_function('getprogname')
+  getprogname_backends = {
+    '_pgmptr': ['getprogname__pgmptr.c', 'getprogname.3', true],
+    '__progname': ['getprogname.c', 'getprogname.3', true],
+  }
+  getprogname_backend_tests = {
+    '_pgmptr': '''#include <stdlib.h>
+                  int main(void) {_pgmptr = "";}''',
+    '__progname': '''extern const char *__progname;
+                     int main(void) {__progname = "";}''',
+  }
+  getprogname_implemented = false
+  foreach var, try : getprogname_backend_tests
+    if cc.links(try, name : var)
+     getprogname_implemented = true
+     stdlib += {'getprogname': getprogname_backends[var]}
+     break
+    endif
+  endforeach
+  if not getprogname_implemented
+    error('no way to implement getprogname()')
+  endif
+else
+  stdlib += {'getprogname': ['', 'getprogname.3', false]}
+endif
+
 if not cc.has_function('arc4random_buf',
                        args : args,
                        prefix : '#include <stdlib.h>')
-  if not cc.has_function('getrandom',
-                         args : args,
-                         prefix : '#include <sys/random.h>')
-    error('no way to implement arc4random_buf')
-  endif
-  stdlib += {
-    'arc4random_buf': ['arc4random_buf_getrandom.c', 'arc4random.3', true]
+  arc4random_backends = {
+    'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
+    'rand_s': ['arc4random_buf_rand_s.c', '''#define _CRT_RAND_S
+                                             #include <stdlib.h>'''],
   }
+  arc4random_implemented = false
+  foreach func, info : arc4random_backends
+    if cc.has_function(func, args : args, prefix : info[1])
+      stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
+      arc4random_implemented = true
+      break
+    endif
+  endforeach
+  if not arc4random_implemented
+    error('no way to implement arc4random')
+  endif
 else
   stdlib += {'arc4random_buf': ['', 'arc4random.3', false]}
 endif
