@@ -34,17 +34,21 @@ foo@bar:~/libobsd$ meson compile -C build
 ```console
 foo@bar:~/libobsd$ meson configure -Dprovide_libbsd=true build
 ```
-The compatibility mode is only compatible with libbsd's overlay mode.
-It should make projects which find libbsd through
+The compatibility mode installs a _libbsd-overlay.pc_ pkg-config definition
+which is a symlink to _libobsd.pc_. It should make projects that find libbsd
+through
 [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) work if
 libobsd implements the used functions.
 
 ### Meson subproject
-The library can be used as a Meson subproject:
+There's a wrap file at [libobsd.wrap](libobsd.wrap) that provides 'libobsd' and
+'libbsd-overlay' dependencies.
+As
+[the Meson documentation](https://mesonbuild.com/Wrap-dependency-system-manual.html#provide-section)
+describes, Meson will automatically fallback to the subproject if the dependency
+is not found in the system.
 ```meson
-libobsd_dep = subproject('libobsd').get_variable('libobsd_dep')
+libbsd_dep = dependency('libbsd-overlay') # libbsd compat
+libbsd_dep = dependency('libobsd')        # use libobsd exclusively
 ```
-Here's how to use it as a fallback to libbsd using the subproject:
-```meson
-libbsd_dep = dependency('libbsd-overlay', fallback : ['libobsd', 'libobsd_dep'])
-```
+When used as a subproject, libobsd is linked statically and installs nothing.
