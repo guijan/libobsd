@@ -61,8 +61,9 @@ endif
 if stdlib['arc4random_buf'][2]
   arc4random_backends = {
     'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
-    'rand_s': ['arc4random_buf_rand_s.c', '''#define _CRT_RAND_S
-                                             #include <stdlib.h>'''],
+    'SystemFunction036': ['arc4random_buf_RtlGenRandom.c',
+                          '''#include <windef.h>
+                             #include <ntsecapi.h>'''],
   }
   foreach func, info : arc4random_backends
     if cc.has_function(func, args: args, prefix: info[1])
