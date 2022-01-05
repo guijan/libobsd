@@ -47,8 +47,8 @@ foreach func, info : string
 endforeach
 
 if string_needed
-  string_inc = configure_file(input : 'string.h.in',
-                              output : 'string.h',
-                              configuration : string_h_data)
+  string_inc = configure_file(input: 'string.h.in',
+                               output: 'string.h',
+                               configuration: string_h_data)
   string_incdir = include_directories('.')
 endif

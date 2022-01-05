@@ -22,60 +22,54 @@ stdlib = {
   'arc4random': ['arc4random.c', 'arc4random.3'],
   'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
   'strtonum': ['strtonum.c', 'arc4random.3'],
+  'getprogname': ['', 'getprogname.3'],
+  'arc4random_buf': ['', 'getprogname.3'],
 }
 
 # set [2] in each array of stdlib
 foreach func, info : stdlib
-  stdlib += {func: stdlib[func] + [not cc.has_function(func)]}
+  func_found = cc.has_function(func, args: args, prefix: '#include <stdlib.h>')
+  stdlib += {func: stdlib[func] + [not func_found]}
 endforeach
 
-if not cc.has_function('getprogname')
+if stdlib['getprogname'][2]
+  short_name = 'program_invocation_short_name'
   getprogname_backends = {
     '_pgmptr': ['getprogname__pgmptr.c', 'getprogname.3', true],
-    '__progname': ['getprogname.c', 'getprogname.3', true],
+    '__progname': ['getprogname___progname.c', 'getprogname.3', true],
+    short_name: ['getprogname_' + short_name + '.c', 'getprogname.3', true]
   }
-  getprogname_backend_tests = {
-    '_pgmptr': '''#include <stdlib.h>
-                  int main(void) {_pgmptr = "";}''',
-    '__progname': '''extern const char *__progname;
-                     int main(void) {__progname = "";}''',
+  getprogname_symbols = {
+    '_pgmptr': 'stdlib.h',
+    short_name: 'errno.h'
   }
-  getprogname_implemented = false
-  foreach var, try : getprogname_backend_tests
-    if cc.links(try, name : var)
-     getprogname_implemented = true
-     stdlib += {'getprogname': getprogname_backends[var]}
-     break
-    endif
-  endforeach
-  if not getprogname_implemented
-    error('no way to implement getprogname()')
+  __progname_found = cc.links('''extern const char *__progname;
+                                 int main(void) {__progname = "";}''',
+                                 name: '__progname')
+  if __progname_found
+    stdlib += {'getprogname': getprogname_backends['__progname']}
+  else
+    foreach symbol, header : getprogname_symbols
+      if cc.has_header_symbol(header, symbol, args: args)
+        stdlib += {'getprogname': getprogname_backends[symbol]}
+        break
+      endif
+    endforeach
   endif
-else
-  stdlib += {'getprogname': ['', 'getprogname.3', false]}
 endif
 
-if not cc.has_function('arc4random_buf',
-                       args : args,
-                       prefix : '#include <stdlib.h>')
+if stdlib['arc4random_buf'][2]
   arc4random_backends = {
     'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
     'rand_s': ['arc4random_buf_rand_s.c', '''#define _CRT_RAND_S
                                              #include <stdlib.h>'''],
   }
-  arc4random_implemented = false
   foreach func, info : arc4random_backends
-    if cc.has_function(func, args : args, prefix : info[1])
+    if cc.has_function(func, args: args, prefix: info[1])
       stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
-      arc4random_implemented = true
       break
     endif
   endforeach
-  if not arc4random_implemented
-    error('no way to implement arc4random')
-  endif
-else
-  stdlib += {'arc4random_buf': ['', 'arc4random.3', false]}
 endif
 
 stdlib_h_data = configuration_data()
@@ -88,7 +82,10 @@ stdlib_incdir = []
 
 foreach func, info : stdlib
   stdlib_h_data.set(func, info[2].to_int())
-  if info[2] # If func is needed
+  if info[2]
+    if info[0] == ''
+     error('no way to implement', func)
+    endif
     stdlib_funcs += func # build up a database of functions in the library
     stdlib_src += files(info[0])
     stdlib_man += files(info[1])
@@ -97,8 +94,8 @@ foreach func, info : stdlib
 endforeach
 
 if stdlib_needed
-  stdlib_inc = configure_file(input : 'stdlib.h.in',
-                              output : 'stdlib.h',
-                              configuration : stdlib_h_data)
+  stdlib_inc = configure_file(input: 'stdlib.h.in',
+                              output: 'stdlib.h',
+                              configuration: stdlib_h_data)
   stdlib_incdir = include_directories('.')
 endif

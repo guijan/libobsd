@@ -13,17 +13,19 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 subdir('err')
-inc += err_inc
-incdir += err_incdir
-src += err_src
-man += err_man
 subdir('stdlib')
-inc += stdlib_inc
-incdir += stdlib_incdir
-src += stdlib_src
-man += stdlib_man
 subdir('string')
-inc += string_inc
-incdir += string_incdir
-src += string_src
-man += string_man
+
+funcs += err_funcs + stdlib_funcs + string_funcs
+inc += [err_inc, stdlib_inc, string_inc]
+incdir += [err_incdir, stdlib_incdir, string_incdir]
+src += err_src + stdlib_src + string_src
+man += err_man + stdlib_man + string_man
+
+def_generator = executable('def_generator', 'def_generator.c')
+
+def = custom_target('def_generator',
+                     command: [def_generator] + funcs,
+                     build_by_default: false,
+                     capture: true,
+                     output: 'libbsd.def')

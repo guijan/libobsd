@@ -12,5 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-option('provide_libbsd', type : 'boolean', value : false,
-       description : 'provide libbsd-overlay functionality')
+option('provide_libbsd', type: 'boolean', value: false,
+       description: 'provide libbsd-overlay.pc file')
+option('test_all', type: 'boolean', value: false,
+       description: 'run all tests, even the tests for functions implemented by'
+                    + ' the system\'s libc')

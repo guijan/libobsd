@@ -14,22 +14,18 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/* getprogname() on top of Microsoft's _pgmptr
- * https://docs.microsoft.com/en-us/cpp/c-runtime-library/pgmptr-wpgmptr?view=msvc-170
- */
-const char *
-getprogname(void)
+int
+main(void)
 {
-	char *str;
-	char *p;
-
-	str = _pgmptr;
-	if ((p = strrchr(str, '/')) != NULL)
-		str = p + 1;
-	if ((p = strrchr(str, '\\')) != NULL)
-		str = p + 1;
-	return (str);
+	printf("getprogname(): '%s'\n", getprogname());
+	#if 0
+	if (getprogname() == NULL || strchr(getprogname(), '/')
+	    || strlen(getprogname()) > FILENAME_MAX)
+		return 1;
+	#endif
+	return 0;
 }

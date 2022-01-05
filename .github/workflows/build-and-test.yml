@@ -21,7 +21,7 @@ on: [push, pull_request]
 #      - uses: actions/checkout@v2.4.0
 #      - name: build
 #        run: |
-#          meson setup --werror build
+#          meson setup build
 #          meson compile -C build
 #      - name: test
 #        run: meson test -C build
@@ -32,11 +32,34 @@ on: [push, pull_request]
 #          path: build/meson-logs
 
 jobs:
+  dietlibc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2.3.1
+      - name: setup
+        run: |
+          pip install meson ninja
+          sudo apt install -y dietlibc-dev
+      - uses: actions/checkout@v2.4.0
+      - name: build
+        run: |
+          CC='diet gcc' meson setup -D'default_library=static' build
+          meson compile -C build
+      - name: test
+        run: meson test -C build
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: linux-meson-logs
+          path: build/meson-logs
   linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v2.3.1
-      - run: pip install meson ninja
+      - name: setup
+        run: |
+          pip install meson ninja
+          sudo apt install -y dietlibc-dev
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -73,7 +96,7 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
-        sys: [MINGW64, MINGW32, UCRT64, CLANG64]
+        sys: [mingw64, mingw32, ucrt64, clang64]
     steps:
       - uses: msys2/setup-msys2@v2
         with:
@@ -94,7 +117,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: msys2-meson-logs
+          name: msys2-${{matrix.sys}}-meson-logs
           path: build/meson-logs
   MSYS:
     runs-on: windows-latest
@@ -119,5 +142,5 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: MSYS-meson-logs
+          name: msys2-msys-meson-logs
           path: build/meson-logs

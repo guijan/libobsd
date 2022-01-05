@@ -14,22 +14,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <errno.h>
 
-/* getprogname() on top of Microsoft's _pgmptr
- * https://docs.microsoft.com/en-us/cpp/c-runtime-library/pgmptr-wpgmptr?view=msvc-170
+/* getprogname() on top of program_invocation_short_name from GNU. Also
+ * implemented in dietlibc.
  */
 const char *
 getprogname(void)
 {
-	char *str;
-	char *p;
-
-	str = _pgmptr;
-	if ((p = strrchr(str, '/')) != NULL)
-		str = p + 1;
-	if ((p = strrchr(str, '\\')) != NULL)
-		str = p + 1;
-	return (str);
+	return (program_invocation_short_name);
 }

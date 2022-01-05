@@ -59,8 +59,8 @@ endforeach
 err_h_data.set('err_h', cc.has_header('err.h').to_int())
 
 if err_needed
-  err_inc = configure_file(input : 'err.h.in',
-                           output : 'err.h',
-                           configuration : err_h_data)
+  err_inc = configure_file(input: 'err.h.in',
+                           output: 'err.h',
+                           configuration: err_h_data)
   err_incdir = include_directories('.')
 endif

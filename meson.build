@@ -15,7 +15,8 @@
 project('libobsd', 'c', version : '0.0.0', license : 'ISC',
         default_options : ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
-args = '-D_GNU_SOURCE'
+args = ['-D_GNU_SOURCE']
+funcs = []
 inc = []
 incdir = []
 src = []
@@ -26,30 +27,33 @@ cc = meson.get_compiler('c')
 subdir('src')
 
 if meson.is_subproject()
-  libobsd = static_library('obsd', src, install : false,
-                           include_directories : incdir)
+  libobsd = static_library('obsd', src, install: false,
+                           include_directories: incdir,
+                           vs_module_defs: def)
 else
   libobsd = library('obsd', src, install : true,
-                    include_directories : incdir)
+                    include_directories: incdir,
+                    vs_module_defs: def)
   install_man(man)
   install_headers(inc, subdir : 'obsd')
   pkg = import('pkgconfig')
   pkg.generate(libobsd,
-               description : 'Transparent OpenBSD compatibility library',
-               filebase : 'libobsd',
-               libraries : libobsd,
-               name : 'libobsd',
-               subdirs : 'obsd',
-               url : 'https://github.com/guijan/libobsd')
+               description: 'Transparent OpenBSD compatibility library',
+               filebase: 'libobsd',
+               libraries: libobsd,
+               name: 'libobsd',
+               subdirs: 'obsd',
+               url: 'https://github.com/guijan/libobsd')
   if get_option('provide_libbsd')
     # https://mesonbuild.com/Pkgconfig-module.html
     # "install_dir the directory to install to, defaults to the value of option
     # libdir followed by /pkgconfig"
     install_symlink('libbsd-overlay.pc',
-                    install_dir : get_option('libdir') + '/pkgconfig',
-                    pointing_to : 'libobsd.pc')
+                    install_dir: get_option('libdir') + '/pkgconfig',
+                    pointing_to: 'libobsd.pc')
   endif
 endif
 
-libobsd_dep = declare_dependency(link_with : libobsd,
-                                 include_directories : incdir)
+libobsd_dep = declare_dependency(link_with: libobsd,
+                                 include_directories: incdir)
+subdir('test')

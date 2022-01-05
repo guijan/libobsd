@@ -14,22 +14,17 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 
-/* getprogname() on top of Microsoft's _pgmptr
- * https://docs.microsoft.com/en-us/cpp/c-runtime-library/pgmptr-wpgmptr?view=msvc-170
+/* def_generator.c: print all of argv[] as a Microsoft .def file.
+ * https://docs.microsoft.com/en-us/cpp/build/reference/module-definition-dot-def-files?view=msvc-170
  */
-const char *
-getprogname(void)
+int
+main(int argc, char *argv[])
 {
-	char *str;
-	char *p;
+	int i;
 
-	str = _pgmptr;
-	if ((p = strrchr(str, '/')) != NULL)
-		str = p + 1;
-	if ((p = strrchr(str, '\\')) != NULL)
-		str = p + 1;
-	return (str);
+	puts("EXPORTS");
+	for (i = 1; i < argc; i++)
+		printf("   %s\n", argv[i]);
 }
