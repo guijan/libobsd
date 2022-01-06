@@ -15,19 +15,43 @@
  */
 
 #include <err.h>
-#include <stdio.h>
+#include <inttypes.h>
+#include <limits.h>
 #include <stdlib.h>
-#include <string.h>
 
+enum {
+	ITERATIONS = 10000
+};
+
+/* How to test a 32 bit number random number generator? Test that it sets each
+ * byte eventually at the very least.
+ * arc4random is implemented through arc4random_buf, so arc4random_buf should
+ * be the one tested for the gritty details.
+ */
 int
 main(void)
 {
-	printf("getprogname(): '%s'\n", getprogname());
-	if (getprogname() == NULL)
-		errx(1, "getprogname() == NULL");
-	if (strchr(getprogname(), '/') != NULL)
-		errx(1, "strchr(getprogname(), '/') != NULL");
-	if (strlen(getprogname()) > FILENAME_MAX)
-		errx(1, "strlen(getprogname()) > FILENAME_MAX");
-	return 0;
+	int bits;
+	uint32_t ret;
+	int i;
+	size_t j;
+
+
+	bits = i = 0;
+	while (bits != 0xF) { /* While the lower 4 bits aren't all set. */
+		ret = arc4random();
+		if (++i > ITERATIONS) {
+			errx(1, "%d iterations have passed and arc4random has"
+			        " yet to set all 4 bytes in its\n"
+			        "returned value. bitarray where 1 bit is 1\n"
+				"byte: %#x",
+			        ITERATIONS, bits);
+		}
+		for (j = 0; j < sizeof(ret); j++) {
+			if (ret & 0xFF)
+				bits |= 1 << j;
+			ret >>= CHAR_BIT;
+		}
+	}
+	return (0);
 }

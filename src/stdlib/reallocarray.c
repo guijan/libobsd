@@ -1,5 +1,7 @@
+/*	$OpenBSD: reallocarray.c,v 1.3 2015/09/13 08:31:47 guenther Exp $	*/
 /*
- * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+ * Copyright (c) 2008 Otto Moerbeek <otto@drijf.net>
+ * Copyright (c) 2021 Guilherme Janczak <guilherme.janczak@yandex.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -15,28 +17,30 @@
  */
 
 #include <errno.h>
-#include <inttypes.h>
 #include <stdlib.h>
-#include <sys/random.h>
 
-/* arc4random_buf() on top of getrandom() from Linux. */
-void
-arc4random_buf(void *_buf, size_t nbytes)
+/*
+ * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
+ * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
+ */
+#define MUL_NO_OVERFLOW	((size_t)1 << (sizeof(size_t) * 4))
+
+void *
+reallocarray(void *optr, size_t nmemb, size_t size)
 {
-	ssize_t ret;
-	unsigned char *buf = _buf;
-	int errc;
-
-	errc = errno;
-	while (nbytes > 0) {
-		ret = getrandom(buf, nbytes, 0);
-		if (ret == -1) {
-			if (errno != EINTR)
-				abort();
-			continue;
-		}
-		buf += ret;
-		nbytes -= ret;
+	if ((nmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
+	    nmemb > 0 && ~(size_t)0 / nmemb < size) {
+		errno = ENOMEM;
+		return NULL;
 	}
-	errno = errc;
+
+	/*
+	 * OpenBSD returns a valid pointer when the allocation size is 0. This
+	 * library follows its behavior.
+	 */
+	if (nmemb == 0 || size == 0) {
+		nmemb = 1;
+		size = 1;
+	}
+	return realloc(optr, size * nmemb);
 }

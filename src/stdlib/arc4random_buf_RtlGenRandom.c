@@ -35,16 +35,16 @@
 #include <windef.h>
 #include <ntsecapi.h>
 
-#include <Minwindef.h>
-
 void
 arc4random_buf(void *_buf, size_t nbytes)
 {
 	unsigned char *buf = _buf;
 	ULONG blk;
 
-	while (nbytes) {
-		blk = min(nbytes, ~(ULONG)0);
+	while (nbytes > 0) {
+		blk = nbytes;
+		if (blk == 0)
+			blk = ~blk;
 		if (RtlGenRandom(buf, blk) == FALSE)
 			abort();
 		buf += blk;

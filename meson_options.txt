@@ -14,6 +14,7 @@
 
 option('provide_libbsd', type: 'boolean', value: false,
        description: 'provide libbsd-overlay.pc file')
-option('test_all', type: 'boolean', value: false,
-       description: 'run all tests, even the tests for functions implemented by'
-                    + ' the system\'s libc')
+option('test_system', type: 'boolean', value: false,
+       description: 'creates a Meson test suite named \'system\' which'
+                    + ' contains the tests for functions\n'
+                    + 'that the current system implements.')

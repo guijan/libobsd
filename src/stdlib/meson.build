@@ -24,6 +24,7 @@ stdlib = {
   'strtonum': ['strtonum.c', 'arc4random.3'],
   'getprogname': ['', 'getprogname.3'],
   'arc4random_buf': ['', 'getprogname.3'],
+  'reallocarray': ['reallocarray.c', 'reallocarray.3'],
 }
 
 # set [2] in each array of stdlib

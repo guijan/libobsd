@@ -15,19 +15,26 @@
  */
 
 #include <err.h>
-#include <stdio.h>
+#include <inttypes.h>
 #include <stdlib.h>
-#include <string.h>
+
+enum {
+	ITERATIONS = 10000
+};
 
 int
 main(void)
 {
-	printf("getprogname(): '%s'\n", getprogname());
-	if (getprogname() == NULL)
-		errx(1, "getprogname() == NULL");
-	if (strchr(getprogname(), '/') != NULL)
-		errx(1, "strchr(getprogname(), '/') != NULL");
-	if (strlen(getprogname()) > FILENAME_MAX)
-		errx(1, "strlen(getprogname()) > FILENAME_MAX");
-	return 0;
+	int i;
+	uint32_t halfmax = ~(uint32_t)0 / 2;
+
+	for (i = 0; i < 100; i++) {
+		if (arc4random_uniform(0) != 0)
+			errx(1, "arc4random_uniform(0) != 0");
+		if (arc4random_uniform(1) != 0)
+			errx(1, "arc4random_uniform(1) != 0");
+		if (arc4random_uniform(halfmax) >= halfmax)
+			errx(1, "arc4random_uniform(%1$u) >= %1$u", halfmax);
+		/* XX: Test the uniform spread of the return value. */
+	}
 }

@@ -15,19 +15,9 @@
  */
 
 #include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int
 main(void)
 {
-	printf("getprogname(): '%s'\n", getprogname());
-	if (getprogname() == NULL)
-		errx(1, "getprogname() == NULL");
-	if (strchr(getprogname(), '/') != NULL)
-		errx(1, "strchr(getprogname(), '/') != NULL");
-	if (strlen(getprogname()) > FILENAME_MAX)
-		errx(1, "strlen(getprogname()) > FILENAME_MAX");
-	return 0;
+	errx(0, "%s", "");
 }

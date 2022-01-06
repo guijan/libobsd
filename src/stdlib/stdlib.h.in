@@ -36,6 +36,10 @@ uint32_t arc4random_uniform(uint32_t);
 const char *getprogname(void);
 #endif
 
+#if @reallocarray@
+void *reallocarray(void *, size_t, size_t);
+#endif
+
 #if @strtonum@
 long long strtonum(const char *, long long, long long, const char **);
 #endif
