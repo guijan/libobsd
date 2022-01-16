@@ -24,33 +24,30 @@ enum {
 };
 
 /* How to test a 32 bit number random number generator? Test that it sets each
- * byte eventually at the very least.
+ * bit eventually at the very least.
  * arc4random is implemented through arc4random_buf, so arc4random_buf should
  * be the one tested for the gritty details.
  */
 int
 main(void)
 {
-	int bits;
-	uint32_t ret;
+	uint32_t bits;
 	int i;
-	size_t j;
+	/* dietlibc doesn't declare UINT32_MAX */
+	uint32_t uint32_max = ~(uint32_t)0;
 
 
 	bits = i = 0;
-	while (bits != 0xF) { /* While the lower 4 bits aren't all set. */
-		ret = arc4random();
+	/*
+	 * The condition reads: While bits ORed with the return of arc4random()
+	 * doesn't have all bits set.
+	 */
+	while ((bits |= arc4random()) != uint32_max) {
 		if (++i > ITERATIONS) {
 			errx(1, "%d iterations have passed and arc4random has"
-			        " yet to set all 4 bytes in its\n"
-			        "returned value. bitarray where 1 bit is 1\n"
-				"byte: %#x",
+			        " yet to set all bits in its\n"
+			        "returned value. Set bits: %#x",
 			        ITERATIONS, bits);
-		}
-		for (j = 0; j < sizeof(ret); j++) {
-			if (ret & 0xFF)
-				bits |= 1 << j;
-			ret >>= CHAR_BIT;
 		}
 	}
 	return (0);

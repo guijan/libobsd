@@ -17,7 +17,7 @@
 #include <errno.h>
 
 /* getprogname() on top of program_invocation_short_name from GNU. Also
- * implemented in dietlibc.
+ * implemented in dietlibc, musl, and likely others.
  */
 const char *
 getprogname(void)

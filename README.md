@@ -41,8 +41,8 @@ through
 libobsd implements the used functions.
 
 ### Meson subproject
-There's a wrap file at [libobsd.wrap](libobsd.wrap) that provides 'libobsd' and
-'libbsd-overlay' dependencies.
+There's a wrap file at [libobsd.wrap](libobsd.wrap) that provides **libobsd**
+and **libbsd-overlay** dependencies.
 As
 [the Meson documentation](https://mesonbuild.com/Wrap-dependency-system-manual.html#provide-section)
 describes, Meson will automatically fallback to the subproject if the dependency
@@ -52,3 +52,7 @@ libbsd_dep = dependency('libbsd-overlay') # libbsd compat
 libbsd_dep = dependency('libobsd')        # use libobsd exclusively
 ```
 When used as a subproject, libobsd is linked statically and installs nothing.
+
+## Contributing
+[CONTRIBUTING.md](CONTRIBUTING.md) contains pointers to the documentation of the
+various C implementations this library has been ported to.

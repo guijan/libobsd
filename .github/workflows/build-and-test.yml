@@ -46,8 +46,7 @@ jobs:
       - name: build
         run: |
           CC='diet gcc' meson setup -Dtest_system=true \
-                        -Ddefault_library=static       \
-                        build
+                        -Ddefault_library=static build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -58,14 +57,74 @@ jobs:
         with:
           name: dietlibc-meson-logs
           path: build/meson-logs
-  glibc:
-    runs-on: ubuntu-latest
+  emscripten:
+    runs-on: macos-latest
     steps:
       - uses: actions/setup-python@v2.3.1
       - name: setup
         run: |
           pip install meson ninja
-          sudo apt install -y dietlibc-dev
+          brew install emscripten
+      - uses: actions/checkout@v2.4.0
+      - name: build
+        run: |
+          meson setup -Ddefault_library=static -Dtest_system=true build \
+              --cross-file .github/workflows/meson-emscripten.ini
+          meson compile -C build
+      - name: test
+        run: meson test --no-suite system -C build
+      - name: test_system
+        run: meson test --suite system -C build || true
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: emscripten-meson-logs
+          path: build/meson-logs
+  uclibc-build:
+    env:
+      # Keep updated with:
+      # https://toolchains.bootlin.com/releases_x86-64-core-i7.html
+      tc: x86-64-core-i7--uclibc--stable-2021.11-1
+      tcpath: /builds/bootlin/toolchains-builder/build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Cache bootlin toolchain
+        uses: actions/cache@v2.1.7
+        id: cache
+        with:
+          path: ${{env.tc}}.tar.bz2
+          key: ${{env.tc}}
+      - uses: actions/setup-python@v2.3.1
+      - name: Download toolchain
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: curl -C - -O https://toolchains.bootlin.com/downloads/releases/toolchains/x86-64-core-i7/tarballs/${{env.tc}}.tar.bz2
+      - name: setup
+        run: |
+          pip install meson ninja
+          sudo mkdir -pm0777 ${{env.tcpath}}
+          tar -C ${{env.tcpath}} -jxf ${{env.tc}}.tar.bz2
+          sed -i -e '/^\[properties\]$/,/^$/d' \
+              ${{env.tcpath}}/${{env.tc}}/etc/meson/cross-compilation.conf
+      - name: build
+        run: |
+          meson setup -Db_lto=false -Dtest_system=true \
+                -Ddefault_library=static --cross-file \
+              '${{env.tcpath}}/${{env.tc}}/etc/meson/cross-compilation.conf' \
+                build
+          meson compile -C build
+      # XX: Make tests work.
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: uclibc-meson-logs
+          path: build/meson-logs
+  glibc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2.3.1
+      - name: setup
+        run: pip install meson ninja
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |

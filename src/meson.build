@@ -23,9 +23,7 @@ src += err_src + stdlib_src + string_src
 man += err_man + stdlib_man + string_man
 
 def_generator = executable('def_generator', 'def_generator.c')
-
 def = custom_target('def_generator',
-                     command: [def_generator] + funcs,
-                     build_by_default: false,
-                     capture: true,
-                     output: 'libbsd.def')
+                    command: [def_generator] + funcs,
+                    capture: true,
+                    output: 'libobsd.def')

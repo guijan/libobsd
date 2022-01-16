@@ -38,7 +38,7 @@ if stdlib['getprogname'][2]
   getprogname_backends = {
     '_pgmptr': ['getprogname__pgmptr.c', 'getprogname.3', true],
     '__progname': ['getprogname___progname.c', 'getprogname.3', true],
-    short_name: ['getprogname_' + short_name + '.c', 'getprogname.3', true]
+    short_name: ['getprogname_' + short_name + '.c', 'getprogname.3', true],
   }
   getprogname_symbols = {
     '_pgmptr': 'stdlib.h',
@@ -66,12 +66,18 @@ if stdlib['arc4random_buf'][2]
                           '''#include <windef.h>
                              #include <ntsecapi.h>'''],
   }
+
   foreach func, info : arc4random_backends
     if cc.has_function(func, args: args, prefix: info[1])
       stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
       break
     endif
   endforeach
+
+  if host_machine.system() == 'emscripten'
+    stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',
+                                  'arc4random.3', true]}
+  endif
 endif
 
 stdlib_h_data = configuration_data()
