@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-name: Build and test
+name: ' ' # empty name
 on: [push, pull_request]
 
 # GitHub Actions doesn't support YAML anchors, so the bit of code below is
@@ -33,6 +33,8 @@ on: [push, pull_request]
 #          name: meson-logs
 #          path: build/meson-logs
 
+# You'll probably want to read the 'glibc:' task first, it's the one that
+# requires the least hacks.
 jobs:
   dietlibc:
     runs-on: ubuntu-latest
@@ -40,8 +42,8 @@ jobs:
       - uses: actions/setup-python@v2.3.1
       - name: setup
         run: |
-          pip install meson ninja
-          sudo apt install -y dietlibc-dev
+          pip install meson
+          sudo apt install -y ninja-build dietlibc-dev
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -57,14 +59,14 @@ jobs:
         with:
           name: dietlibc-meson-logs
           path: build/meson-logs
+
   emscripten:
     runs-on: macos-latest
     steps:
       - uses: actions/setup-python@v2.3.1
       - name: setup
         run: |
-          pip install meson ninja
-          brew install emscripten
+          brew install meson samurai emscripten
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -80,6 +82,7 @@ jobs:
         with:
           name: emscripten-meson-logs
           path: build/meson-logs
+
   uclibc-build:
     env:
       # Keep updated with:
@@ -119,6 +122,7 @@ jobs:
         with:
           name: uclibc-meson-logs
           path: build/meson-logs
+
   glibc:
     runs-on: ubuntu-latest
     steps:
@@ -139,11 +143,45 @@ jobs:
         with:
           name: glibc-meson-logs
           path: build/meson-logs
+
+  haiku:
+    runs-on: ubuntu-latest
+    container: docker.io/hectormolinero/qemu-haiku:latest
+    steps:
+      # Copied from: https://github.com/hectorm/docker-qemu-haiku#github-actions
+      # Notice I changed make to meson in the 'Install packages' step.
+      - name: 'Wait until the VM is ready'
+        run: 'container-init & timeout 600 vmshell exit 0'
+      - name: 'Install packages'
+        run: 'vmshell pkgman install -y meson gcc haiku_devel'
+      - name: 'Checkout project'
+        uses: 'actions/checkout@main'
+      - name: 'Copy project to VM'
+        run: 'vmshell mkdir ./src/; tar -cf - ./ | vmshell tar -xf - -C ./src/'
+      # Now the rest is much of the same old.
+      - name: build
+        run: |
+          vmshell meson setup -Dtest_system=true build src
+          vmshell meson compile -C build
+      - name: test
+        run: vmshell meson test --no-suite system -C build
+      - name: test_system
+        run: vmshell meson test --suite system -C build || true
+      - name: copy failure logs
+        if: failure()
+        run: |
+          vmshell tar -cf - build/meson-logs | tar -xf -
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: haiku-meson-logs
+          path: build/meson-logs
+
   macos:
     runs-on: macos-latest
     steps:
       - uses: actions/setup-python@v2.3.1
-      - run: pip install meson ninja
+      - run: brew install meson samurai
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -158,6 +196,7 @@ jobs:
         with:
           name: macos-meson-logs
           path: build/meson-logs
+
   msys2:
     runs-on: windows-latest
     defaults:
@@ -165,17 +204,21 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
-        sys: [mingw64, mingw32, ucrt64, clang64]
+        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
     steps:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.sys}}
-          release: false
-          update: false
+          update: true
           path-type: strict
-          install: git
-          pacboy: >-
-            gcc:p clang:p meson:p ninja:p
+          install: pactoys
+      - name: setup
+        run: |
+          # Lines stolen from:
+          # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
+          grep -qF '[clang32]' /etc/pacman.conf || sed -i '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' /etc/pacman.conf
+          pacman --noconfirm -Suuy
+          pacboy --noconfirm -S --needed gcc:p clang:p meson:p ninja:p
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -190,6 +233,7 @@ jobs:
         with:
           name: ${{matrix.sys}}-meson-logs
           path: build/meson-logs
+
   MSYS:
     runs-on: windows-latest
     defaults:
@@ -199,8 +243,6 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MSYS
-          release: false
-          update: false
           path-type: strict
           install: git gcc clang meson ninja
       - uses: actions/checkout@v2.4.0
@@ -215,5 +257,5 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: msys-meson-logs
+          name: msys2-meson-logs
           path: build/meson-logs

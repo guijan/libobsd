@@ -14,24 +14,29 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(H_OBSD_STRING)
-#define H_OBSD_STRING
+#include <err.h>
+#include <string.h>
 
-#include_next <string.h>
+int
+main(void)
+{
+	char csv[] = "comma,separated,values, ,\n,,";
+	char *values[] = {"comma", "separated", "values", " ", "\n", "", ""};
+	char *p, *next;
+	size_t i;
 
-#if @explicit_bzero@
-void explicit_bzero(void *, size_t);
-#endif
+	/* Test that it actually separates the string. */
+	next = csv;
+	for (i = 0; i < sizeof(values) / sizeof(*values); i++) {
+		p = strsep(&next, ",");
+		if (strcmp(p, values[i]) != 0)
+			errx(1, "strcmp(\"%s\", \"%s\") != 0", p, values[i]);
+	}
 
-#if @strlcpy@
-size_t strlcpy(char *, const char *, size_t);
-#endif
-#if @strlcat@
-size_t strlcat(char *, const char *, size_t);
-#endif
+	/* "If *stringp is initially NULL, strsep() returns NULL." */
+	p = NULL;
+	if (strsep(&p, ",") != NULL)
+		errx(1, "strsep(NULL, "") != NULL");
 
-#if @strsep@
-char *strsep(char **, const char *);
-#endif
-
-#endif /* !defined(H_OBSD_STRING) */
+	return (0);
+}

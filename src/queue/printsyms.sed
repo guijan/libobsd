@@ -1,3 +1,5 @@
+#!/usr/bin/sed -Enf
+
 # Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
@@ -12,9 +14,11 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-option('provide_libbsd', type: 'boolean', value: false,
-       description: 'Provide a libbsd-overlay.pc pkg-config definition.')
-option('test_system', type: 'boolean', value: false,
-       description: 'Creates a Meson test suite named \'system\' which'
-                    + ' contains the tests for functions that the current'
-                    + ' implements.')
+# printsyms: helper script for printing the symbols in queue.h
+# Obviously, it doesn't understand C syntax.
+
+# Don't print the debug macros inside #if defined(QUEUE_MACRO_DEBUG)
+/^#if defined/,/^#endif$/d
+
+# Print all the other macro names.
+s/^#define ([^[:space:](]+).*/  '\1',/p

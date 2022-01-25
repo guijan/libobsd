@@ -1,11 +1,10 @@
+.\" $OpenBSD: strsep.3,v 1.14 2013/06/05 03:39:23 tedu Exp $
 .\"
-.\" Copyright (c) 1980, 1991, 1993
+.\" Copyright (c) 1990, 1991, 1993
 .\"	The Regents of the University of California.  All rights reserved.
-.\" Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
 .\"
 .\" This code is derived from software contributed to Berkeley by
-.\" the American National Standards Committee X3, on Information
-.\" Processing Systems.
+.\" Chris Torek.
 .\"
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
@@ -31,92 +30,81 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\"	$OpenBSD: malloc.3,v 1.128 2021/04/09 06:04:15 otto Exp $
+.\"	@(#)strsep.3	8.1 (Berkeley) 6/9/93
 .\"
-.Dd $Mdocdate: Feb 2 2022 $
-.Dt REALLOCARRAY 3
+.Dd $Mdocdate: June 5 2013 $
+.Dt STRSEP 3
 .Os
 .Sh NAME
-.Nm reallocarray
-.Nd array allocation
+.Nm strsep
+.Nd separate strings
 .Sh SYNOPSIS
-.In stdlib.h
-.Ft void *
-.Fn reallocarray "void *ptr" "size_t nmemb" "size_t size"
+.In string.h
+.Ft char *
+.Fn strsep "char **stringp" "const char *delim"
 .Sh DESCRIPTION
-Designed for safe allocation of arrays,
-the
-.Fn reallocarray
-function is similar to
-.Fn realloc
-except it operates on
-.Fa nmemb
-members of size
-.Fa size
-and checks for integer overflow in the calculation
-.Fa nmemb
-*
-.Fa size .
-.Sh RETURN VALUES
-Upon successful completion,
-.Fn reallocarray
-returns a pointer to the allocated space; otherwise,
-.Dv NULL
-is returned and
-.Va errno
-is set to
-.Er ENOMEM .
+The
+.Fn strsep
+function locates, in the string referenced by
+.Fa *stringp ,
+the first occurrence of any character in the string
+.Fa delim
+(or the terminating
+.Ql \e0
+character) and replaces it with a
+.Ql \e0 .
+The location of the next character after the delimiter character
+(or
+.Dv NULL ,
+if the end of the string was reached) is stored in
+.Fa *stringp .
+The original value of
+.Fa *stringp
+is returned.
+.Pp
+An
+.Dq empty
+field, i.e., one caused by two adjacent delimiter characters,
+can be detected by comparing the location referenced by the pointer returned
+by
+.Fn strsep
+to
+.Ql \e0 .
 .Pp
 If
-.Fa nmemb
-or
-.Fa size
-is equal to 0, a unique pointer to a zero sized object is returned.
-.Pp
-If multiplying
-.Fa nmemb
-and
-.Fa size
-results in integer overflow,
-.Fn reallocarray
+.Fa *stringp
+is initially
+.Dv NULL ,
+.Fn strsep
 returns
-.Dv NULL
-and sets
-.Va errno
-to
-.Er ENOMEM .
-.Sh IDIOMS
-Consider
-.Fn reallocarray
-when there is multiplication in the
-.Fa size
-argument of
-.Fn malloc
-or
-.Fn realloc .
-For example, avoid this common idiom as it may lead to integer overflow:
+.Dv NULL .
+.Sh EXAMPLES
+The following uses
+.Fn strsep
+to parse a string, containing tokens delimited by whitespace, into an
+argument vector:
 .Bd -literal -offset indent
-if ((p = malloc(num * size)) == NULL)
-	err(1, NULL);
+char **ap, *argv[10], *inputstring;
+
+for (ap = argv; ap < &argv[9] &&
+    (*ap = strsep(&inputstring, " \et")) != NULL;) {
+	if (**ap != '\e0')
+		ap++;
+}
+*ap = NULL;
 .Ed
-.Pp
-A drop-in replacement is the
-.Ox
-extension
-.Fn reallocarray :
-.Bd -literal -offset indent
-if ((p = reallocarray(NULL, num, size)) == NULL)
-	err(1, NULL);
-.Ed
-.Pp
-Alternatively,
-.Fn calloc
-may be used at the cost of initialization overhead.
-.Sh SEE ALSO
-.Xr calloc 3 ,
-.Xr recallocarray 3
 .Sh HISTORY
 The
-.Fn reallocarray
-function appeared in
-.Ox 5.6 .
+.Fn strsep
+function first appeared in
+.Bx 4.3 Reno .
+It is intended as a replacement for the
+.Xr strtok 3
+function.
+While the
+.Xr strtok 3
+function should be preferred for portability reasons (it conforms to
+.St -ansiC )
+it is unable to handle empty fields, i.e., detect fields delimited by
+two adjacent delimiter characters, or to be used for more than a single
+string at a time.

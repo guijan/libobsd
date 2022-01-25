@@ -20,5 +20,4 @@ int
 main(void)
 {
 	errc(0, 0, "%s", "");
-	return (1);
 }

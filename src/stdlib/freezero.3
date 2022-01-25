@@ -33,90 +33,29 @@
 .\"
 .\"	$OpenBSD: malloc.3,v 1.128 2021/04/09 06:04:15 otto Exp $
 .\"
-.Dd $Mdocdate: Feb 2 2022 $
-.Dt REALLOCARRAY 3
+.Dd $Mdocdate: April 9 2021 $
+.Dt MALLOC 3
 .Os
 .Sh NAME
-.Nm reallocarray
-.Nd array allocation
+.Nm freezero
+.Nd scrubbed memory deallocation
 .Sh SYNOPSIS
-.In stdlib.h
-.Ft void *
-.Fn reallocarray "void *ptr" "size_t nmemb" "size_t size"
+.Fn freezero "void *ptr" "size_t size"
 .Sh DESCRIPTION
-Designed for safe allocation of arrays,
-the
-.Fn reallocarray
-function is similar to
-.Fn realloc
-except it operates on
-.Fa nmemb
-members of size
+The
+.Fn freezero
+guarantees the memory range starting at
+.Fa ptr
+with length
 .Fa size
-and checks for integer overflow in the calculation
-.Fa nmemb
-*
-.Fa size .
-.Sh RETURN VALUES
-Upon successful completion,
-.Fn reallocarray
-returns a pointer to the allocated space; otherwise,
-.Dv NULL
-is returned and
-.Va errno
-is set to
-.Er ENOMEM .
-.Pp
-If
-.Fa nmemb
-or
-.Fa size
-is equal to 0, a unique pointer to a zero sized object is returned.
-.Pp
-If multiplying
-.Fa nmemb
-and
-.Fa size
-results in integer overflow,
-.Fn reallocarray
-returns
-.Dv NULL
-and sets
-.Va errno
-to
-.Er ENOMEM .
+is discarded while deallocating the whole object originally allocated.
 .Sh IDIOMS
-Consider
-.Fn reallocarray
-when there is multiplication in the
-.Fa size
-argument of
-.Fn malloc
-or
-.Fn realloc .
-For example, avoid this common idiom as it may lead to integer overflow:
-.Bd -literal -offset indent
-if ((p = malloc(num * size)) == NULL)
-	err(1, NULL);
-.Ed
-.Pp
-A drop-in replacement is the
-.Ox
-extension
-.Fn reallocarray :
-.Bd -literal -offset indent
-if ((p = reallocarray(NULL, num, size)) == NULL)
-	err(1, NULL);
-.Ed
-.Pp
-Alternatively,
-.Fn calloc
-may be used at the cost of initialization overhead.
-.Sh SEE ALSO
-.Xr calloc 3 ,
-.Xr recallocarray 3
+The
+.Fn freezero
+function should be used for deallocating objects containing sensitive data like
+keys.
 .Sh HISTORY
 The
-.Fn reallocarray
+.Fn freezero
 function appeared in
-.Ox 5.6 .
+.Ox 6.2 .

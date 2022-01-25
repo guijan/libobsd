@@ -35,7 +35,7 @@ err = {
 
 # set [2] in each array of err
 foreach func, info : err
-  err += {func: err[func] + [not cc.has_function(func)]}
+  err += {func: err[func] + [not cc.has_function(func, dependencies: deps)]}
 endforeach
 
 err_h_data = configuration_data()

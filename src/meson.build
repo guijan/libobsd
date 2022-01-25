@@ -15,12 +15,17 @@
 subdir('err')
 subdir('stdlib')
 subdir('string')
+subdir('unistd')
 
-funcs += err_funcs + stdlib_funcs + string_funcs
-inc += [err_inc, stdlib_inc, string_inc]
-incdir += [err_incdir, stdlib_incdir, string_incdir]
-src += err_src + stdlib_src + string_src
-man += err_man + stdlib_man + string_man
+# queue.h is a special case; it only provides a header and handles its own
+# installation-except for the manual.
+subdir('queue')
+
+funcs += err_funcs + stdlib_funcs + string_funcs + unistd_funcs
+inc += [err_inc, stdlib_inc, string_inc, unistd_inc]
+incdir += [err_incdir, stdlib_incdir, string_incdir, unistd_incdir]
+src += err_src + stdlib_src + string_src + unistd_src
+man += err_man + stdlib_man + string_man + queue_man + unistd_man
 
 def_generator = executable('def_generator', 'def_generator.c')
 def = custom_target('def_generator',

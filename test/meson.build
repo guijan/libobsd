@@ -5,19 +5,28 @@ tests = {
   'err': 'err.c',
   'errc': 'errc.c',
   'errx': 'errx.c',
+  'explicit_bzero': 'explicit_bzero.c',
+  'freezero': 'freezero.c',
   'getprogname': 'getprogname.c',
+  'pledge': 'pledge.c',
   'reallocarray': 'reallocarray.c',
+  'recallocarray': 'recallocarray.c',
   'strlcat': 'strlcat.c',
   'strlcpy': 'strlcpy.c',
+  'strsep': 'strsep.c',
   'strtonum': 'strtonum.c',
+  'unveil': 'unveil.c',
+  'warn': 'warn.c',
+  'warnc': 'warn.c',
+  'warnx': 'warnx.c',
 }
 
 foreach testname, src : tests
   if funcs.contains(testname)
     test(testname, executable(testname, src, dependencies: libobsd_dep),
-                              suite: 'libobsd')
+         suite: 'libobsd')
   elif get_option('test_system')
     test(testname, executable(testname, src, dependencies: libobsd_dep),
-                              suite: 'system')
+         suite: 'system')
   endif
 endforeach

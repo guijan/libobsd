@@ -27,6 +27,6 @@ main(void)
 	if (memcmp(bufhigh, zeroes, BUFLEN) != 0)
 		errx(1, "memcmp(bufhigh, zeroes, BUFLEN) != 0");
 
-	/* XX: Add randomness analysis and check for thread and fork safety. */
+	/* XXX: Add randomness analysis and check for thread and fork safety. */
 	return (0);
 }

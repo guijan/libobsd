@@ -1,6 +1,7 @@
 .\" $OpenBSD: arc4random.3,v 1.37 2019/09/29 16:30:35 jmc Exp $
 .\"
 .\" Copyright 1997 Niels Provos <provos@physnet.uni-hamburg.de>
+.\" Copyright 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
 .\" All rights reserved.
 .\"
 .\" Redistribution and use in source and binary forms, with or without
@@ -30,7 +31,7 @@
 .\"
 .\" Manual page, using -mandoc macros
 .\"
-.Dd $Mdocdate: September 29 2019 $
+.Dd $Mdocdate: Feb 2 2022 $
 .Dt ARC4RANDOM 3
 .Os
 .Sh NAME
@@ -63,17 +64,7 @@ including
 and
 .Xr chroot 2 .
 .Pp
-High quality 32-bit pseudo-random numbers are generated very quickly.
-On each call, a cryptographic pseudo-random number generator is used
-to generate a new result.
-One data pool is used for all consumers in a process, so that consumption
-under program flow can act as additional stirring.
-The subsystem is re-seeded from the kernel
-.Xr random 4
-subsystem using
-.Xr getentropy 2
-on a regular basis, and also upon
-.Xr fork 2 .
+High quality pseudo-random numbers are generated very quickly.
 .Pp
 The
 .Fn arc4random
@@ -112,5 +103,6 @@ In
 .Ox 5.5
 it was replaced with the ChaCha20 cipher, and it may be replaced
 again in the future as cryptographic techniques advance.
+libobsd implements it by calling the underlying system's RNG API.
 A good mnemonic is
-.Dq A Replacement Call for Random .
+.Qq A Replacement Call for Random .

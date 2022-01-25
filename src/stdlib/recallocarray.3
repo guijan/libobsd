@@ -34,39 +34,50 @@
 .\"	$OpenBSD: malloc.3,v 1.128 2021/04/09 06:04:15 otto Exp $
 .\"
 .Dd $Mdocdate: Feb 2 2022 $
-.Dt REALLOCARRAY 3
+.Dt MALLOC 3
 .Os
 .Sh NAME
-.Nm reallocarray
-.Nd array allocation
+.Nm recallocarray
+.Nd zeroed array allocation
 .Sh SYNOPSIS
 .In stdlib.h
 .Ft void *
-.Fn reallocarray "void *ptr" "size_t nmemb" "size_t size"
+.Fn recallocarray "void *ptr" "size_t oldnmemb" "size_t nmemb" "size_t size"
 .Sh DESCRIPTION
-Designed for safe allocation of arrays,
-the
-.Fn reallocarray
+The
+.Fn recallocarray
 function is similar to
-.Fn realloc
-except it operates on
-.Fa nmemb
-members of size
-.Fa size
-and checks for integer overflow in the calculation
-.Fa nmemb
+.Fn reallocarray
+except it ensures newly allocated memory is cleared similar to
+.Fn calloc , and that memory becoming unallocated is explicitly discarded.
+If
+.Fa ptr
+is
+.Dv NULL ,
+.Fa oldnmemb
+is ignored and the call is equivalent to
+.Fn calloc .
+If
+.Fa ptr
+is not
+.Dv NULL ,
+.Fa oldnmemb
+must be a value such that
+.Fa oldnmemb
 *
-.Fa size .
+.Fa size
+is the size of the earlier allocation that returned
+.Fa ptr ,
+otherwise the behavior is undefined.
 .Sh RETURN VALUES
 Upon successful completion,
-.Fn reallocarray
+.Fn recallocarray
 returns a pointer to the allocated space; otherwise,
 .Dv NULL
 is returned and
 .Va errno
 is set to
 .Er ENOMEM .
-.Pp
 If
 .Fa nmemb
 or
@@ -78,45 +89,45 @@ If multiplying
 and
 .Fa size
 results in integer overflow,
-.Fn reallocarray
+.Fn recallocarray
 returns
 .Dv NULL
 and sets
 .Va errno
 to
 .Er ENOMEM .
-.Sh IDIOMS
-Consider
-.Fn reallocarray
-when there is multiplication in the
+.Pp
+If
+.Fa ptr
+is not
+.Dv NULL
+and multiplying
+.Fa oldnmemb
+and
 .Fa size
-argument of
-.Fn malloc
-or
-.Fn realloc .
-For example, avoid this common idiom as it may lead to integer overflow:
-.Bd -literal -offset indent
-if ((p = malloc(num * size)) == NULL)
-	err(1, NULL);
-.Ed
-.Pp
-A drop-in replacement is the
-.Ox
-extension
-.Fn reallocarray :
-.Bd -literal -offset indent
-if ((p = reallocarray(NULL, num, size)) == NULL)
-	err(1, NULL);
-.Ed
-.Pp
-Alternatively,
-.Fn calloc
-may be used at the cost of initialization overhead.
+results in integer overflow,
+.Fn recallocarray
+returns
+.Dv NULL
+and sets
+.Va errno
+to
+.Er EINVAL .
+.Sh IDIOMS
+The
+.Fn recallocarray
+function should be used for resizing objects containing sensitive data like
+keys.
+To avoid leaking information,
+it guarantees memory is cleared before placing it on the internal free list.
+Deallocation of such an object should be done by calling
+.Fn freezero .
 .Sh SEE ALSO
 .Xr calloc 3 ,
-.Xr recallocarray 3
+.Xr freezero 3 ,
+.Xr reallocarray 3
 .Sh HISTORY
 The
-.Fn reallocarray
+.Fn recallocarray
 function appeared in
-.Ox 5.6 .
+.Ox 6.1 .

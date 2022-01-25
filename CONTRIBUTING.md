@@ -1,13 +1,9 @@
 # Contributing
 
-## Design
-
-
-
 ## C Programming API reference
 Some systems are not well documented, these directions help finding
 documentation relevant to libobsd. The project's name links to the official web
-view of the source tree with with cloning instructions.
+view of the source tree with cloning instructions.
 
 ### [Bionic](https://android.googlesource.com/platform/bionic/)
 [Current libc symbols](https://android.googlesource.com/platform/bionic/+/master/libc/libc.map.txt).
@@ -33,6 +29,9 @@ unofficial, and
 [the official documentation](https://www.gnu.org/software/libc/manual) is the
 ultimate authority on it.
 
+### [Haiku](https://git.haiku-os.org/haiku/tree/)
+Browse the headers at [headers/](https://git.haiku-os.org/haiku/tree/headers).
+
 ### Mac OS X
 "[These manual pages are a subset of the Mac OS X manual pages](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/index.html#//apple_ref/doc/uid/TP40007259)".
 I can't find the Mac OS X manual pages.
@@ -43,7 +42,7 @@ system API and runtimes, for instance neither ucrt nor msvcrt implement
 `getopt()`, but Mingw provides it for you. Mingw's headers also require less
 kludging than Windows' and the project provides export libraries Microsoft
 doesn't like advapi32.def. Thus, Microsoft's documentation is not strictly
-correct when used for understanding Mingw. For instance, Microsoft's the
+correct when used for understanding Mingw. For instance, Microsoft's
 RtlGenRandom documentation tells us to use the runtime loader to access the
 function, but Mingw's advapi32.def allows us to link against the library that
 contains it at compile time.

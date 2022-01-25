@@ -20,16 +20,19 @@
 #
 stdlib = {
   'arc4random': ['arc4random.c', 'arc4random.3'],
-  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
-  'strtonum': ['strtonum.c', 'arc4random.3'],
-  'getprogname': ['', 'getprogname.3'],
   'arc4random_buf': ['', 'getprogname.3'],
+  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
+  'freezero': ['freezero.c', 'freezero.3'],
+  'getprogname': ['', 'getprogname.3'],
   'reallocarray': ['reallocarray.c', 'reallocarray.3'],
+  'recallocarray': ['recallocarray.c', 'recallocarray.3'],
+  'strtonum': ['strtonum.c', 'arc4random.3'],
 }
 
 # set [2] in each array of stdlib
 foreach func, info : stdlib
-  func_found = cc.has_function(func, args: args, prefix: '#include <stdlib.h>')
+  func_found = cc.has_function(func, args: args, prefix: '#include <stdlib.h>',
+                               dependencies: deps)
   stdlib += {func: stdlib[func] + [not func_found]}
 endforeach
 
@@ -67,17 +70,20 @@ if stdlib['arc4random_buf'][2]
                              #include <ntsecapi.h>'''],
   }
 
+  if host_machine.system() == 'emscripten'
+    stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',
+                                  'arc4random.3', true]}
+  elif host_machine.system() == 'haiku'
+    stdlib += {'arc4random_buf': ['arc4random_buf_dev_urandom.c',
+                                  'arc4random.3', true]}
+  endif
+
   foreach func, info : arc4random_backends
     if cc.has_function(func, args: args, prefix: info[1])
       stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
       break
     endif
   endforeach
-
-  if host_machine.system() == 'emscripten'
-    stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',
-                                  'arc4random.3', true]}
-  endif
 endif
 
 stdlib_h_data = configuration_data()

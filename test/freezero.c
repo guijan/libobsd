@@ -14,24 +14,22 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(H_OBSD_STRING)
-#define H_OBSD_STRING
+#include <err.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include_next <string.h>
+/* How does one even test freezero()? */
+int
+main(void)
+{
+	void *p;
+	int allocsz[] = {0, 1, 2, BUFSIZ, 4096, 333, arc4random_uniform(8192)};
+	size_t i;
 
-#if @explicit_bzero@
-void explicit_bzero(void *, size_t);
-#endif
-
-#if @strlcpy@
-size_t strlcpy(char *, const char *, size_t);
-#endif
-#if @strlcat@
-size_t strlcat(char *, const char *, size_t);
-#endif
-
-#if @strsep@
-char *strsep(char **, const char *);
-#endif
-
-#endif /* !defined(H_OBSD_STRING) */
+	for (i = 0; i < sizeof(allocsz) / sizeof(*allocsz); i++) {
+		if ((p = malloc(allocsz[i] == 0 ? 1 : allocsz[i])) == NULL)
+			err(1, "(p = malloc(%d)) == NULL", allocsz[i]);
+		freezero(p, allocsz[i]);
+	}
+	return (0);
+}

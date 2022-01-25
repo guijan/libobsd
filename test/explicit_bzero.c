@@ -14,27 +14,39 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <string.h>
 #include <err.h>
-#include <inttypes.h>
-#include <stdlib.h>
 
 enum {
-	ITERATIONS = 10000
+	BUFLEN = 1024
 };
 
+/* Check that explicit_bzero() doesn't overrun at the very least.
+ *
+ * XXX: Check that it's not optimized out.
+ */
 int
 main(void)
 {
-	int i;
-	uint32_t halfmax = ~(uint32_t)0 / 2;
+	unsigned char _buf[BUFLEN * 3];
+	unsigned char *buflow = _buf;
+	unsigned char *bufmid = buflow + BUFLEN;
+	unsigned char *bufhigh = bufmid + BUFLEN;
+	unsigned char compare[BUFLEN];
+	memset(_buf, 0xFF, sizeof(_buf));
 
-	for (i = 0; i < 100; i++) {
-		if (arc4random_uniform(0) != 0)
-			errx(1, "arc4random_uniform(0) != 0");
-		if (arc4random_uniform(1) != 0)
-			errx(1, "arc4random_uniform(1) != 0");
-		if (arc4random_uniform(halfmax) >= halfmax)
-			errx(1, "arc4random_uniform(%1$u) >= %1$u", halfmax);
-		/* XXX: Test the uniform spread of the return value. */
-	}
+	explicit_bzero(bufmid, BUFLEN);
+
+
+	memset(compare, 0xFF, sizeof(compare));
+	if (memcmp(buflow, compare, BUFLEN) != 0)
+		err(1, "memcmp(buflow, compare, buflen) != 0");
+	if (memcmp(bufhigh, compare, BUFLEN) != 0)
+		err(1, "memcmp(bufhigh, compare, buflen) != 0");
+
+	memset(compare, 0, sizeof(compare));
+	if (memcmp(bufmid, compare, BUFLEN) != 0)
+		err(1, "memcmp(bufmid, compare, buflen) != 0");
+
+	return (0);
 }

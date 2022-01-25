@@ -14,24 +14,46 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(H_OBSD_STRING)
-#define H_OBSD_STRING
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <unistd.h>
 
-#include_next <string.h>
+/* Haiku doesn't have a proper programming API for generating random numbers, so
+ * it's impossible to provide the semantics of arc4random_buf(). We'll
+ * approximate them with /dev/urandom.
+ */
+void
+arc4random_buf(void *_buf, size_t nbytes)
+{
+	int errnum;
+	int fd;
+	unsigned char *buf = _buf;
+	ssize_t nr;
+	size_t unr;
+	errnum = errno;
 
-#if @explicit_bzero@
-void explicit_bzero(void *, size_t);
-#endif
+	while ((fd = open("/dev/urandom", O_RDONLY|O_CLOEXEC)) == -1) {
+		if (errno == EINTR)
+			continue;
+		abort();
+	}
 
-#if @strlcpy@
-size_t strlcpy(char *, const char *, size_t);
-#endif
-#if @strlcat@
-size_t strlcat(char *, const char *, size_t);
-#endif
+	while (nbytes > 0) {
+		nr = read(fd, buf, nbytes);
+		if (nr == -1) {
+			if (errno == EINTR)
+				continue;
+			abort();
+		} else if (nr == 0) {
+			abort(); /* /dev/urandom should never EOF. */
+		}
 
-#if @strsep@
-char *strsep(char **, const char *);
-#endif
+		unr = nr;
+		buf += unr;
+		nbytes -= unr;
+	}
 
-#endif /* !defined(H_OBSD_STRING) */
+	close(fd);
+	errno = errnum;
+}

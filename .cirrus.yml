@@ -56,5 +56,5 @@ task:
     kvm: true
   name: musl
   install_script:
-    - apk add meson ninja alpine-sdk clang
+    - apk add meson alpine-sdk clang
   << : *common_script

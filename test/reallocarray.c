@@ -57,6 +57,10 @@ main(void)
 			err(1, "(p = reallocarray(NULL, %zu, %zu)) == NULL",
 			    nums[i].a, nums[i].b);
 		}
+		/*
+		 * Use the memory to try to trigger a crash if there's something
+		 * wrong.
+		 */
 		arc4random_buf(p, nums[i].a * nums[i].b);
 		free(p);
 	}

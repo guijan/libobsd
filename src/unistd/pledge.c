@@ -14,24 +14,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(H_OBSD_STRING)
-#define H_OBSD_STRING
+int
+pledge(const char *unused1, const char *unused2)
+{
+	(void)unused1;
+	(void)unused2;
 
-#include_next <string.h>
-
-#if @explicit_bzero@
-void explicit_bzero(void *, size_t);
-#endif
-
-#if @strlcpy@
-size_t strlcpy(char *, const char *, size_t);
-#endif
-#if @strlcat@
-size_t strlcat(char *, const char *, size_t);
-#endif
-
-#if @strsep@
-char *strsep(char **, const char *);
-#endif
-
-#endif /* !defined(H_OBSD_STRING) */
+	return (0);
+}

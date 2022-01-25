@@ -29,5 +29,5 @@ main(void)
 		errx(1, "strchr(getprogname(), '/') != NULL");
 	if (strlen(getprogname()) > FILENAME_MAX)
 		errx(1, "strlen(getprogname()) > FILENAME_MAX");
-	return 0;
+	return (0);
 }

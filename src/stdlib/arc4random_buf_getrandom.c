@@ -14,10 +14,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/random.h>
+
 #include <errno.h>
 #include <inttypes.h>
 #include <stdlib.h>
-#include <sys/random.h>
 
 /* arc4random_buf() on top of getrandom() from Linux. */
 void

@@ -18,40 +18,38 @@
 # [1] = 'filename of the manual of the function'
 # [2] = is the function needed? true/false
 #
-string = {
-  'explicit_bzero': ['explicit_bzero.c', 'explicit_bzero.3'],
-  'strlcat': ['strlcat.c', 'strlcpy.3'],
-  'strlcpy': ['strlcpy.c', 'strlcpy.3'],
-  'strsep': ['strsep.c', 'strsep.3'],
+unistd = {
+  'pledge': ['pledge.c', 'pledge.3'],
+  'unveil': ['unveil.c', 'unveil.3'],
 }
 
-# set [2] in each array of string
-foreach func, info : string
-  string += {func: string[func] + [not cc.has_function(func,
+# set [2] in each array of unistd
+foreach func, info : unistd
+  unistd += {func: unistd[func] + [not cc.has_function(func,
                                                        dependencies: deps)]}
 endforeach
 
-string_h_data = configuration_data()
-string_needed = false
-string_funcs = []
-string_src = []
-string_man = []
-string_inc = []
-string_incdir = []
+unistd_h_data = configuration_data()
+unistd_needed = false
+unistd_funcs = []
+unistd_src = []
+unistd_man = []
+unistd_inc = []
+unistd_incdir = []
 
-foreach func, info : string
-  string_h_data.set(func, info[2].to_int())
+foreach func, info : unistd
+  unistd_h_data.set(func, info[2].to_int())
   if info[2] # If func is needed
-    string_funcs += func # build up a database of functions in the library
-    string_src += files(info[0])
-    string_man += files(info[1])
-    string_needed = true
+    unistd_funcs += func # build up a database of functions in the library
+    unistd_src += files(info[0])
+    unistd_man += files(info[1])
+    unistd_needed = true
   endif
 endforeach
 
-if string_needed
-  string_inc = configure_file(input: 'string.h.in',
-                              output: 'string.h',
-                              configuration: string_h_data)
-  string_incdir = include_directories('.')
+if unistd_needed
+  unistd_inc = configure_file(input: 'unistd.h.in',
+                              output: 'unistd.h',
+                              configuration: unistd_h_data)
+  unistd_incdir = include_directories('.')
 endif

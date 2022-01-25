@@ -1,0 +1,58 @@
+.\"	$OpenBSD: mdoc.template,v 1.15 2014/03/31 00:09:54 dlg Exp $
+.\"
+.\" Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.\" The following requests are required for all man pages.
+.\"
+.\" Remove `\&' from the line below.
+.Dd $Mdocdate: Feb 4 2022 $
+.Dt PLEDGE 3
+.Os
+.Sh NAME
+.Nm unveil
+.Nd compatibility stub for OpenBSD's
+.Fn unveil
+.Sh SYNOPSIS
+.In unistd.h
+.Ft int
+.Fn unveil "const char *unused1" "const char *unused2"
+.Sh DESCRIPTION
+The
+.Fn unveil
+function from libobsd does nothing and succeeds.
+A macro with the same name is provided; a sane call should be optimized out
+and become a no-op rather than incurring function call overhead.
+.Sh RETURN VALUES
+.Fn unveil
+returns 0.
+.Sh EXAMPLES
+This compatibility stub allows use of
+.Fn unveil
+in portable programs without putting it inside a preprocessor conditional.
+Instead of this idiom:
+.Bd -literal -offset indent
+#ifdef __OpenBSD__
+if (unveil(promises, execpromises))
+	err(1, "unveil");
+#endif
+.Ed
+.Pp
+Use the following:
+.Bd -literal -offset indent
+if (unveil(path, permissions))
+	err(1, "unveil");
+.Ed
+.Sh SEE ALSO
+.Xr pledge 3
