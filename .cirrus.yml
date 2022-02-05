@@ -33,7 +33,7 @@ common_template: &common_script
 
 task:
   container:
-    image: xeffyr/termux:x86_64
+    image: kcubeterm/termux:x86_64
     kvm: true
   name: bionic
   install_script:
