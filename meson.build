@@ -12,13 +12,13 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-project('libobsd', 'c', version: '0.0.0', license: 'ISC',
+project('libobsd', 'c', version: '1.0.0', license: 'ISC',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
 args = ['-D_GNU_SOURCE']
 deps = []
 funcs = []
-inc = []
+gen_inc = [] # generated headers
 incdir = []
 src = []
 man = []
@@ -34,23 +34,28 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   deps += cc.find_library('compat')
 endif
 
-add_project_arguments(args, language: 'c')
+inst_h = not meson.is_subproject()
+h_inst_dir = get_option('includedir') / 'obsd'
+# The global args are needed to get the underlying system to expose its
+# functions to anyone who uses this library.
+add_global_arguments(args, language: 'c')
 subdir('src')
 
 if meson.is_subproject()
-  libobsd = static_library('obsd', src,
+  libobsd = static_library('obsd', src + gen_inc,
                            install: false,
                            include_directories: incdir,
                            vs_module_defs: def,
-                           dependencies: deps)
+                           dependencies: deps,
+                           version: meson.project_version())
 else
-  libobsd = library('obsd', src,
+  libobsd = library('obsd', src + gen_inc,
                     install: true,
                     include_directories: incdir,
                     vs_module_defs: def,
-                    dependencies: deps)
+                    dependencies: deps,
+                    version: meson.project_version())
   install_man(man)
-  install_headers(inc, subdir: 'obsd')
   pkg = import('pkgconfig')
   pkg.generate(libobsd,
                description: 'Transparent OpenBSD compatibility library',
@@ -75,6 +80,7 @@ else
 endif
 
 libobsd_dep = declare_dependency(link_with: libobsd,
+                                 sources: gen_inc,
                                  dependencies: deps,
                                  include_directories: incdir,
                                  compile_args: args)

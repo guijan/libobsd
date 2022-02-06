@@ -77,50 +77,12 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
+      - name: install
+        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
           name: emscripten-meson-logs
-          path: build/meson-logs
-
-  uclibc-build:
-    env:
-      # Keep updated with:
-      # https://toolchains.bootlin.com/releases_x86-64-core-i7.html
-      tc: x86-64-core-i7--uclibc--stable-2021.11-1
-      tcpath: /builds/bootlin/toolchains-builder/build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2.4.0
-      - name: Cache bootlin toolchain
-        uses: actions/cache@v2.1.7
-        id: cache
-        with:
-          path: ${{env.tc}}.tar.bz2
-          key: ${{env.tc}}
-      - uses: actions/setup-python@v2.3.1
-      - name: Download toolchain
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: curl -C - -O https://toolchains.bootlin.com/downloads/releases/toolchains/x86-64-core-i7/tarballs/${{env.tc}}.tar.bz2
-      - name: setup
-        run: |
-          pip install meson ninja
-          sudo mkdir -pm0777 ${{env.tcpath}}
-          tar -C ${{env.tcpath}} -jxf ${{env.tc}}.tar.bz2
-          sed -i -e '/^\[properties\]$/,/^$/d' \
-              ${{env.tcpath}}/${{env.tc}}/etc/meson/cross-compilation.conf
-      - name: build
-        run: |
-          meson setup -Db_lto=false -Dtest_system=true \
-                -Ddefault_library=static --cross-file \
-              '${{env.tcpath}}/${{env.tc}}/etc/meson/cross-compilation.conf' \
-                build
-          meson compile -C build
-      # XX: Make tests work.
-      - uses: actions/upload-artifact@v2.3.1
-        if: failure()
-        with:
-          name: uclibc-meson-logs
           path: build/meson-logs
 
   glibc:
@@ -191,6 +153,8 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
+      - name: install
+        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -218,7 +182,7 @@ jobs:
           # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
           grep -qF '[clang32]' /etc/pacman.conf || sed -i '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' /etc/pacman.conf
           pacman --noconfirm -Suuy
-          pacboy --noconfirm -S --needed gcc:p clang:p meson:p ninja:p
+          pacboy --noconfirm -S --needed clang:p meson:p ninja:p
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -228,6 +192,8 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
+      - name: install
+        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -254,6 +220,8 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
+      - name: install
+        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:

@@ -27,6 +27,8 @@ common_template: &common_script
     - meson test --no-suite system -C build
   test_system_script:
     - meson test --suite system -C build || true
+  install_script:
+    - meson install -C build
   on_failure:
     termux-meson-logs_artifacts:
       path: build/meson-logs
@@ -36,7 +38,7 @@ task:
     image: kcubeterm/termux:x86_64
     kvm: true
   name: bionic
-  install_script:
+  setup_script:
     - pkg install -y ninja clang python
     - pip install meson
   << : *common_script
@@ -46,7 +48,7 @@ task:
     # Keep updated with newest release from https://www.freebsd.org/releases/
     image: freebsd-13-0-release-amd64
   name: freebsd
-  install_script:
+  setup_script:
     - pkg install -y meson ninja gcc
   << : *common_script
 
@@ -55,6 +57,6 @@ task:
     image: alpine:latest
     kvm: true
   name: musl
-  install_script:
+  setup_script:
     - apk add meson alpine-sdk clang
   << : *common_script

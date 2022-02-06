@@ -12,17 +12,19 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+header_generator = executable('header_generator', 'header_generator.c')
+
 subdir('err')
 subdir('stdlib')
 subdir('string')
 subdir('unistd')
 
-# queue.h is a special case; it only provides a header and handles its own
-# installation-except for the manual.
+# queue.h is a special case; it only provides a header. It also must not be
+# added to `inc` because it needs to be installed to a subdir, it's handled
+# separately.
 subdir('queue')
 
-funcs += err_funcs + stdlib_funcs + string_funcs + unistd_funcs
-inc += [err_inc, stdlib_inc, string_inc, unistd_inc]
+funcs += err_func + stdlib_func + string_func + unistd_func
 incdir += [err_incdir, stdlib_incdir, string_incdir, unistd_incdir]
 src += err_src + stdlib_src + string_src + unistd_src
 man += err_man + stdlib_man + string_man + queue_man + unistd_man

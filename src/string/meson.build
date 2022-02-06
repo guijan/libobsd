@@ -31,27 +31,30 @@ foreach func, info : string
                                                        dependencies: deps)]}
 endforeach
 
-string_h_data = configuration_data()
 string_needed = false
-string_funcs = []
+string_func = []
 string_src = []
 string_man = []
-string_inc = []
 string_incdir = []
 
 foreach func, info : string
-  string_h_data.set(func, info[2].to_int())
-  if info[2] # If func is needed
-    string_funcs += func # build up a database of functions in the library
+  if not info[2]
+    continue
+  endif
+    string_func += func # build up a database of functions in the library
     string_src += files(info[0])
     string_man += files(info[1])
     string_needed = true
-  endif
 endforeach
 
 if string_needed
-  string_inc = configure_file(input: 'string.h.in',
+  gen_inc += custom_target('generate_string_h',
+                              input: 'string.h.in',
+                              feed: true,
                               output: 'string.h',
-                              configuration: string_h_data)
+                              capture: true,
+                              command: [header_generator] + string_func,
+                              install: inst_h,
+                              install_dir: h_inst_dir)
   string_incdir = include_directories('.')
 endif

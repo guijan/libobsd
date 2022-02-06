@@ -19,35 +19,20 @@
 
 #include_next <stdlib.h>
 
-#if @arc4random@ || @arc4random_uniform@
-#include <stdint.h>
-#endif
-#if @arc4random@
-uint32_t arc4random(void);
-#endif
-#if @arc4random_buf@
-void arc4random_buf(void *, size_t);
-#endif
-#if @arc4random_uniform@
-uint32_t arc4random_uniform(uint32_t);
-#endif
+#pragma libobsd stdlib_uint32 #include <stdint.h>
 
-#if @getprogname@
-const char *getprogname(void);
-#endif
+#pragma libobsd arc4random uint32_t arc4random(void);
+#pragma libobsd arc4random_buf void arc4random_buf(void *, size_t);
+#pragma libobsd arc4random_uniform uint32_t arc4random_uniform(uint32_t);
 
-#if @freezero@
-void freezero(void *, size_t);
-#endif
-#if @reallocarray@
-void *reallocarray(void *, size_t, size_t);
-#endif
-#if @recallocarray@
-void *recallocarray(void *, size_t, size_t, size_t);
-#endif
+#pragma libobsd getprogname const char *getprogname(void);
 
-#if @strtonum@
-long long strtonum(const char *, long long, long long, const char **);
-#endif
+#pragma libobsd freezero void freezero(void *, size_t);
+#pragma libobsd reallocarray void *reallocarray(void *, size_t, size_t);
+#pragma libobsd recallocarray void *recallocarray(void *, size_t, size_t,
+#pragma libobsd recallocarray                     size_t);
+
+#pragma libobsd strtonum long long strtonum(const char *, long long, long long,
+#pragma libobsd strtonum                    const char **);
 
 #endif /* !defined(H_OBSD_STDLIB) */

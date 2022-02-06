@@ -20,47 +20,69 @@
 #
 err = {
   'err': ['err.c', 'err.3'],
-  'errc': ['errc.c', 'err.3'],
+  'errc': ['errc.c', 'errc.3'],
   'errx': ['errx.c', 'err.3'],
-  'verr': ['verr.c', 'err.3'],
-  'verrc': ['verrc.c', 'err.3'],
-  'verrx': ['verrx.c', 'err.3'],
-  'vwarn': ['vwarn.c', 'err.3'],
-  'vwarnc': ['vwarnc.c', 'err.3'],
-  'vwarnx': ['vwarnx.c', 'err.3'],
   'warn': ['warn.c', 'err.3'],
-  'warnc': ['warnc.c', 'err.3'],
+  'warnc': ['warnc.c', 'errc.3'],
   'warnx': ['warnx.c', 'err.3'],
 }
+
+verr = {
+  'verr': ['verr.c', 'err.3'],
+  'verrc': ['verrc.c', 'errc.3'],
+  'verrx': ['verrx.c', 'err.3'],
+  'vwarn': ['vwarn.c', 'err.3'],
+  'vwarnc': ['vwarnc.c', 'errc.3'],
+  'vwarnx': ['vwarnx.c', 'err.3'],
+}
+
+err += verr
 
 # set [2] in each array of err
 foreach func, info : err
   err += {func: err[func] + [not cc.has_function(func, dependencies: deps)]}
 endforeach
 
-err_h_data = configuration_data()
-err_needed = false
-err_funcs = []
+# We might need to include stdarg.h if one of the err functions that take
+# variadic arguments are needed.
+stdarg_needed = false
+
+err_func = []
 err_src = []
 err_man = []
-err_inc = []
 err_incdir = []
+err_pragma = []
+err_needed = false
 
 foreach func, info : err
-  err_h_data.set(func, info[2].to_int())
-  if info[2] # If func is needed
-    err_funcs += func # build up a database of functions in the library
-    err_src += files(info[0])
-    err_man += files(info[1])
-    err_needed = true
+  if not info[2]
+    continue
   endif
+
+  if func in verr
+    stdarg_needed = true
+  endif
+  err_func += func # build up a database of functions in the library
+  err_src += files(info[0])
+  err_man += files(info[1])
+  err_needed = true
 endforeach
 
-err_h_data.set('err_h', cc.has_header('err.h').to_int())
-
 if err_needed
-  err_inc = configure_file(input: 'err.h.in',
+  err_pragma += err_func
+  if cc.has_header('err.h')
+    err_pragma += 'err_h'
+  endif
+  if stdarg_needed
+    err_pragma += 'verr_func'
+  endif
+  gen_inc += custom_target('generate_err_h',
+                           input: 'err.h.in',
+                           feed: true,
                            output: 'err.h',
-                           configuration: err_h_data)
+                           capture: true,
+                           command: [header_generator] + err_pragma,
+                           install: inst_h,
+                           install_dir: h_inst_dir)
   err_incdir = include_directories('.')
 endif

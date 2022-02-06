@@ -19,15 +19,21 @@
 # [2] = is the function needed? true/false
 #
 stdlib = {
-  'arc4random': ['arc4random.c', 'arc4random.3'],
-  'arc4random_buf': ['', 'getprogname.3'],
-  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
+  'arc4random_buf': ['', 'arc4random.3'],
   'freezero': ['freezero.c', 'freezero.3'],
   'getprogname': ['', 'getprogname.3'],
   'reallocarray': ['reallocarray.c', 'reallocarray.3'],
   'recallocarray': ['recallocarray.c', 'recallocarray.3'],
-  'strtonum': ['strtonum.c', 'arc4random.3'],
+  'strtonum': ['strtonum.c', 'strtonum.3'],
 }
+
+# These are the functions that need the uint32_t type.
+stdlib_uint32 = {
+  'arc4random': ['arc4random.c', 'arc4random.3'],
+  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
+}
+
+stdlib += stdlib_uint32
 
 # set [2] in each array of stdlib
 foreach func, info : stdlib
@@ -86,30 +92,38 @@ if stdlib['arc4random_buf'][2]
   endforeach
 endif
 
-stdlib_h_data = configuration_data()
 stdlib_needed = false
-stdlib_funcs = []
+stdlib_func = []
 stdlib_src = []
 stdlib_man = []
-stdlib_inc = []
 stdlib_incdir = []
+stdlib_pragma = []
 
 foreach func, info : stdlib
-  stdlib_h_data.set(func, info[2].to_int())
-  if info[2]
-    if info[0] == ''
-     error('no way to implement', func)
-    endif
-    stdlib_funcs += func # build up a database of functions in the library
-    stdlib_src += files(info[0])
-    stdlib_man += files(info[1])
-    stdlib_needed = true
+  if not info[2]
+    continue
   endif
+  if info[0] == ''
+   error('no way to implement', func)
+  endif
+  if func in stdlib_uint32
+    stdlib_pragma = ['stdlib_uint32']
+  endif
+  stdlib_func += func # build up a database of functions in the library
+  stdlib_src += files(info[0])
+  stdlib_man += files(info[1])
+  stdlib_needed = true
 endforeach
 
 if stdlib_needed
-  stdlib_inc = configure_file(input: 'stdlib.h.in',
+  stdlib_pragma += stdlib_func
+  gen_inc += custom_target('generate_stdlib_h',
+                              input: 'stdlib.h.in',
+                              feed: true,
                               output: 'stdlib.h',
-                              configuration: stdlib_h_data)
+                              capture: true,
+                              command: [header_generator] + stdlib_pragma,
+                              install: inst_h,
+                              install_dir: h_inst_dir)
   stdlib_incdir = include_directories('.')
 endif

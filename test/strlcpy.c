@@ -2,7 +2,7 @@
 
 /*
  * Copyright (c) 2014 Todd C. Miller <millert@openbsd.org>
- * Copyright (c) 2021 Guilherme Janczak <guilherme.janczak@yandex.com>
+ * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above

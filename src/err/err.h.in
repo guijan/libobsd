@@ -17,49 +17,20 @@
 #if !defined(H_OBSD_ERR)
 #define H_OBSD_ERR
 
-#if @err_h@
-#include_next <err.h>
-#endif
+#pragma libobsd err_h #include_next <err.h>
+#pragma libobsd verr_func #include <stdarg.h>
 
-#if @verr@ || @verrc@ || @verrx@ || @vwarn@ || @vwarnc@ || @vwarnx@
-#include <stdarg.h>
-#endif
-
-#if @err@
-void err(int, const char *, ...);
-#endif
-#if @verr@
-void verr(int, const char *, va_list);
-#endif
-#if @errc@
-void errc(int, int, const char *, ...);
-#endif
-#if @verrc@
-void verrc(int, int, const char *, va_list);
-#endif
-#if @errx@
-void errx(int, const char *, ...);
-#endif
-#if @verrx@
-void verrx(int eval, const char *, va_list);
-#endif
-#if @warn@
-void warn(const char *, ...);
-#endif
-#if @vwarn@
-void vwarn(const char *, va_list);
-#endif
-#if @warnc@
-void warnc(int, const char *, ...);
-#endif
-#if @vwarnc@
-void vwarnc(int, const char *, va_list);
-#endif
-#if @warnx@
-void warnx(const char *, ...);
-#endif
-#if @vwarnx@
-void vwarnx(const char *fmt, va_list);
-#endif
+#pragma libobsd err void err(int, const char *, ...);
+#pragma libobsd errc void errc(int, int, const char *, ...);
+#pragma libobsd errx void errx(int, const char *, ...);
+#pragma libobsd verr void verr(int, const char *, va_list);
+#pragma libobsd verrc void verrc(int, int, const char *, va_list);
+#pragma libobsd verrx void verrx(int eval, const char *, va_list);
+#pragma libobsd vwarn void vwarn(const char *, va_list);
+#pragma libobsd vwarnc void vwarnc(int, const char *, va_list);
+#pragma libobsd vwarnx void vwarnx(const char *fmt, va_list);
+#pragma libobsd warn void warn(const char *, ...);
+#pragma libobsd warnc void warnc(int, const char *, ...);
+#pragma libobsd warnx void warnx(const char *, ...);
 
 #endif /* !defined(H_OBSD_ERR) */

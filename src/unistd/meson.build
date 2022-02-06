@@ -29,27 +29,30 @@ foreach func, info : unistd
                                                        dependencies: deps)]}
 endforeach
 
-unistd_h_data = configuration_data()
 unistd_needed = false
-unistd_funcs = []
+unistd_func = []
 unistd_src = []
 unistd_man = []
-unistd_inc = []
 unistd_incdir = []
 
 foreach func, info : unistd
-  unistd_h_data.set(func, info[2].to_int())
-  if info[2] # If func is needed
-    unistd_funcs += func # build up a database of functions in the library
-    unistd_src += files(info[0])
-    unistd_man += files(info[1])
-    unistd_needed = true
+  if not info[2]
+    continue
   endif
+  unistd_func += func # build up a database of functions in the library
+  unistd_src += files(info[0])
+  unistd_man += files(info[1])
+  unistd_needed = true
 endforeach
 
 if unistd_needed
-  unistd_inc = configure_file(input: 'unistd.h.in',
+  gen_inc += custom_target('generate_unistd_h',
+                              input: 'unistd.h.in',
+                              feed: true,
                               output: 'unistd.h',
-                              configuration: unistd_h_data)
+                              capture: true,
+                              command: [header_generator] + unistd_func,
+                              install: inst_h,
+                              install_dir: h_inst_dir)
   unistd_incdir = include_directories('.')
 endif
