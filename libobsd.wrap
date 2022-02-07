@@ -1,8 +1,8 @@
 [wrap-git]
 url = https://github.com/guijan/libobsd.git
-revision = master
+revision = v1.0.0
 depth = 1
 
 [provide]
-libbsd-overlay=libobsd_dep
-libobsd=libobsd_dep
+libbsd-overlay = libobsd_dep
+libobsd = libobsd_dep

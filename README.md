@@ -54,6 +54,6 @@ libbsd_dep = dependency('libobsd')        # use libobsd exclusively
 When used as a subproject, libobsd is linked statically and installs nothing.
 
 ## Contributing
-[CONTRIBUTING.md](CONTRIBUTING.md) contains a bit of information on the design
-of libobsd, and pointers to the documentation of the various C implementations
-the library has been ported to.
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) contains a bit of information on
+the design of libobsd, and pointers to the documentation of the various C
+implementations the library has been ported to.

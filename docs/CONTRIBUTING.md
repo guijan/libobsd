@@ -1,35 +1,34 @@
 # Contributing
-In this page, there are some scattered thoughts about the design of libobsd that
-should help with understanding it.
 
-There are 2 sections about finding libc/system documentation relevant to
-libobsd. The operating system/libc names in the subsection titles link to the
-official web view of the source tree.
+## Sending patches
+Follow [OpenBSD's KNF](https://man.openbsd.org/style) programming style when
+writing C. Follow Meson's documentation when writing Meson.
+
+Here's a checklist:
+- [ ] Add your name and (optionally) a mail address to the copyright of every
+  file you modify.
+- [ ] Put the name of every function you added in [CHANGELOG.MD](CHANGELOG.md).
+  Create the file it if it doesn't exist.
+- [ ] Run this: `meson setup -Dtest_system=true build && meson test -C build`.
+  Did it fail? Don't break the build.
 
 ## Design
 Headers are generated with a simple DSL by
-[src/header_generator.c](src/header_generator.c).
-It's essentially our own #pragma for the C language, although the parser is very
-dumb. Also, it doesn't handle lines over 80 characters, but I won't let anyone
-add lines over 80 characters to source files anyway. The purpose of the DSL is
-to ship clean headers that seem to have been built specifically for the current
-platform.
+[src/header_generator.c](src/header_generator.c). It's essentially our own
+#pragma for the C language. The purpose of the DSL is to ship clean headers
+without an #ifdef forest.
 
-Every subdirectory under src/ is named after a header. 'stdlib/' for 'stdlib.h'
-and 'err/' for 'err.h' and so on. All the functions inside each subdirectory
-belong to that header. Instead of creating an unintelligible #ifdef forest, I've
-chosen to split each "backend" that implements a function into its own file.
+Every subdirectory under *src/* is named after a header. *stdlib/* for
+*stdlib.h* and *err/* for *err.h* and so on. All the functions inside each
+subdirectory belong to that header. Instead of piling up `#ifdef`s, I've chosen
+to split each "backend" that implements a function into its own file.
 
 Feature detection is used unless something is impossible to detect. For
-instance, there is some manual checking for Haiku specifically spread around the
-library, just look for the Meson string 'haiku'. I can only guess how much work
-it is for libbsd to keep track of who added what and when and to keep their
-OS/libc tests up to date or to add a new platform, but in libobsd as much of it
-is automagic as possible.
+instance, there is some manual checking for Haiku.
 
 I don't intend to implement deprecated functions like rindex(), or silly
 functions like getbsize(). I trust the underlying platform, if it is buggy, fix
-the bug at the source.
+the bug at the source instead of working around it.
 
 ## 1st class systems.
 It's very easy to support all the systems in this category because we have
@@ -89,9 +88,8 @@ Browse the headers at
 [include/](https://git.musl-libc.org/cgit/musl/tree/include).
 
 ## 2nd class systems
-I was unable to get working CI for these systems, so while libobsd intends to
-work with them, it'll have to rely on bug reports to stay working. Or someone
-could implement CI for them.
+I was unable to get working CI for these systems, but libobsd intends to work
+with them.
 
 ### [Illumos](https://github.com/illumos/illumos-gate)
 Browse the [man pages](https://illumos.org/man).

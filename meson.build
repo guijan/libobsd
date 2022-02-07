@@ -24,36 +24,35 @@ src = []
 man = []
 cc = meson.get_compiler('c')
 
-# Some systems need options specific to them.
+# Some systems implement some OpenBSD functions, but need to link in a library
+# or set a macro to expose them.
 if host_machine.system() == 'haiku'
-  # Haiku has a BSD compatibility library that we can depend on.
   deps += cc.find_library('bsd')
   args += ['-D_BSD_SOURCE']
+elif host_machine.system() == 'netbsd'
+  args += ['-D_OPENBSD_SOURCE']
 elif cc.has_header_symbol('features.h', '__dietlibc__')
-  # dietlibc also implements some GNU and BSD extensions in a separate library.
   deps += cc.find_library('compat')
 endif
 
 inst_h = not meson.is_subproject()
 h_inst_dir = get_option('includedir') / 'obsd'
-# The global args are needed to get the underlying system to expose its
-# functions to anyone who uses this library.
-add_global_arguments(args, language: 'c')
+# We do have global args, but I've chosen to pass them manually where they're
+# needed, so add_global_arguments isn't used.
+add_project_arguments(args, language: 'c')
 subdir('src')
 
 if meson.is_subproject()
   libobsd = static_library('obsd', src + gen_inc,
-                           install: false,
-                           include_directories: incdir,
-                           vs_module_defs: def,
-                           dependencies: deps,
-                           version: meson.project_version())
+                  install: false,
+                  include_directories: incdir,
+                  dependencies: deps)
 else
   libobsd = library('obsd', src + gen_inc,
                     install: true,
                     include_directories: incdir,
-                    vs_module_defs: def,
                     dependencies: deps,
+                    vs_module_defs: def,
                     version: meson.project_version())
   install_man(man)
   pkg = import('pkgconfig')
