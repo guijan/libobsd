@@ -7,7 +7,7 @@ writing C. Follow Meson's documentation when writing Meson.
 Here's a checklist:
 - [ ] Add your name and (optionally) a mail address to the copyright of every
   file you modify.
-- [ ] Put the name of every function you added in [CHANGELOG.MD](CHANGELOG.md).
+- [ ] Put the name of every function you added in [CHANGELOG.md](CHANGELOG.md).
   Create the file it if it doesn't exist.
 - [ ] Run this: `meson setup -Dtest_system=true build && meson test -C build`.
   Did it fail? Don't break the build.
@@ -63,7 +63,7 @@ Browse the headers at [headers/](https://git.haiku-os.org/haiku/tree/headers).
 
 ### Mac OS X
 "[These manual pages are a subset of the Mac OS X manual pages](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/index.html#//apple_ref/doc/uid/TP40007259)".
-I can't find the Mac OS X manual pages.
+[keith/xcode-man-pages](https://keith.github.io/xcode-man-pages/).
 
 ### [Mingw-w64](https://github.com/mingw-w64/mingw-w64)
 Mingw conveniently provides some useful functions on top of Microsoft's C
@@ -83,6 +83,10 @@ and Windows system headers at
 Microsoft also has a
 [UCRT alphabetical function reference](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/crt-alphabetical-function-reference?view=msvc-170).
 
+### [MSYS2](https://github.com/msys2/msys2-runtime)
+Browse the headers at
+[newlib/libc/include](https://github.com/msys2/msys2-runtime/tree/msys2-3_3_4-release/newlib/libc/include).
+
 ### [musl](https://git.musl-libc.org/cgit/musl)
 Browse the headers at
 [include/](https://git.musl-libc.org/cgit/musl/tree/include).
@@ -90,6 +94,9 @@ Browse the headers at
 ## 2nd class systems
 I was unable to get working CI for these systems, but libobsd intends to work
 with them.
+
+### [DragonflyBSD](https://gitweb.dragonflybsd.org/dragonfly.git/tree)
+[On-Line Manual Pages](https://leaf.dragonflybsd.org/cgi/web-man).
 
 ### [Illumos](https://github.com/illumos/illumos-gate)
 Browse the [man pages](https://illumos.org/man).
