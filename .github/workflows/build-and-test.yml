@@ -77,8 +77,6 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - name: install
-        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -153,8 +151,6 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - name: install
-        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -192,8 +188,6 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - name: install
-        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -220,10 +214,38 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - name: install
-        run: meson install -C build
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
           name: msys2-meson-logs
+          path: build/meson-logs
+
+  visual-studio:
+    # Reference: https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        uwp: [true, false]
+    steps:
+      - uses: actions/setup-python@v2.3.1
+      - run: pip install meson ninja
+      - uses: actions/checkout@v2.4.0
+      - uses: ilammy/msvc-dev-cmd@v1.10.0
+        with:
+          uwp: ${{matrix.sys}}
+          spectre: true
+      - name: build
+        run: |
+          $env:Path += $env:VCINSTALLDIR + 'Tools\Llvm\bin;'
+          $env:CC = 'clang-cl'
+          meson setup -Dtest_system=true build
+          meson compile -C build
+      - name: test
+        run: meson test --no-suite system -C build
+      - name: test_system
+        run: meson test --suite system -C build || true
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: vs-meson-logs
           path: build/meson-logs

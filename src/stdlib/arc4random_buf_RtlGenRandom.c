@@ -30,9 +30,10 @@
  * https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt?view=msvc-170
  *
  * Annoyingly, ntsecapi.h doesn't declare the types it uses, so make sure to
- * include windef.h BEFORE including ntsecapi.h
+ * include windows.h BEFORE including ntsecapi.h
  */
-#include <windef.h>
+#define _WIN32_WINNT 0x0501 /* Oldest version with SystemFunction036, XP. */
+#include <windows.h>
 #include <ntsecapi.h>
 
 void

@@ -71,10 +71,11 @@ endif
 if stdlib['arc4random_buf'][2]
   arc4random_backends = {
     'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
-    'SystemFunction036': ['arc4random_buf_RtlGenRandom.c',
-                          '''#include <windef.h>
-                             #include <ntsecapi.h>'''],
-  }
+    'RtlGenRandom': ['arc4random_buf_RtlGenRandom.c',
+                     '''#define _WIN32_WINNT 0x0501
+                        #include <windows.h>
+                        #include <ntsecapi.h>'''],
+    }
 
   if host_machine.system() == 'emscripten'
     stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',

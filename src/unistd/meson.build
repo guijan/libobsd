@@ -34,6 +34,7 @@ unistd_func = []
 unistd_src = []
 unistd_man = []
 unistd_incdir = []
+unistd_pragma = []
 
 foreach func, info : unistd
   if not info[2]
@@ -46,12 +47,16 @@ foreach func, info : unistd
 endforeach
 
 if unistd_needed
+  if cc.has_header('unistd.h')
+    unistd_pragma += 'unistd_h'
+  endif
   gen_inc += custom_target('generate_unistd_h',
                               input: 'unistd.h.in',
                               feed: true,
                               output: 'unistd.h',
                               capture: true,
-                              command: [header_generator] + unistd_func,
+                              command: [header_generator] + unistd_func +
+                                       unistd_pragma,
                               install: inst_h,
                               install_dir: h_inst_dir)
   unistd_incdir = include_directories('.')

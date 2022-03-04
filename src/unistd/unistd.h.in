@@ -17,7 +17,8 @@
 #if !defined(H_OBSD_UNISTD)
 #define H_OBSD_UNISTD
 
-#include_next <unistd.h>
+#pragma libobsd unistd_h #include_next <unistd.h>
+#include <stddef.h>
 
 /*
  * pledge/unveil can't be ported, but they're also not strictly necessary.
