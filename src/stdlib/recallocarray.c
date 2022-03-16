@@ -19,32 +19,39 @@
 /* OPENBSD ORIGINAL: lib/libc/stdlib/recallocarray.c */
 
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+/*
+ * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
+ * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
+ */
+#define MUL_NO_OVERFLOW ((size_t)1 << (sizeof(size_t) * 4))
 
 void *
-recallocarray(void *_ptr, size_t oldnmemb, size_t newnmemb, size_t size)
+recallocarray(void *ptr, size_t oldnmemb, size_t newnmemb, size_t size)
 {
-	unsigned char *ptr = _ptr;
 	size_t oldsize, newsize;
-	unsigned char *newptr;
+	void *newptr;
 
-	if (__builtin_mul_overflow(newnmemb, size, &newsize)) {
+	if ((newnmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
+	    newnmemb > 0 && SIZE_MAX / newnmemb < size) {
 		errno = ENOMEM;
 		return NULL;
 	}
-
-	if (newsize == 0)
-		newsize = 1;
+	newsize = newnmemb * size;
 	if (ptr == NULL)
-		return calloc(newsize, 1);
+		return calloc(newsize > 0 ? newsize : 1, 1);
 
-	if (__builtin_mul_overflow(oldnmemb, size, &oldsize)) {
+	if ((oldnmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
+	    oldnmemb > 0 && SIZE_MAX / oldnmemb < size) {
 		errno = EINVAL;
 		return NULL;
 	}
+	oldsize = oldnmemb * size;
 
 	/*
 	 * Don't bother too much if we're shrinking just a bit,
@@ -54,20 +61,20 @@ recallocarray(void *_ptr, size_t oldnmemb, size_t newnmemb, size_t size)
 		size_t d = oldsize - newsize;
 
 		if (d < oldsize / 2 && d < BUFSIZ) {
-			explicit_bzero(ptr + newsize, d);
+			explicit_bzero((char *)ptr + newsize, d);
 			return ptr;
 		}
 	}
 
-	if ((newptr = malloc(newsize)) == NULL)
+	newptr = malloc(newsize > 0 ? newsize : 1);
+	if (newptr == NULL)
 		return NULL;
 
 	if (newsize > oldsize) {
 		memcpy(newptr, ptr, oldsize);
-		explicit_bzero(newptr + oldsize, newsize - oldsize);
-	} else {
+		explicit_bzero((char *)newptr + oldsize, newsize - oldsize);
+	} else
 		memcpy(newptr, ptr, newsize);
-	}
 
 	explicit_bzero(ptr, oldsize);
 	free(ptr);

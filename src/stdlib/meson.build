@@ -71,11 +71,11 @@ endif
 if stdlib['arc4random_buf'][2]
   arc4random_backends = {
     'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
-    'RtlGenRandom': ['arc4random_buf_RtlGenRandom.c',
-                     '''#define _WIN32_WINNT 0x0501
-                        #include <windows.h>
-                        #include <ntsecapi.h>'''],
-    }
+    'BCryptGenRandom': ['arc4random_buf_BCryptGenRandom.c',
+                        '''#include <windows.h>
+                        #include <bcrypt.h>'''],
+
+  }
 
   if host_machine.system() == 'emscripten'
     stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',
@@ -85,9 +85,14 @@ if stdlib['arc4random_buf'][2]
                                   'arc4random.3', true]}
   endif
 
+  bcrypt_dep = cc.find_library('bcrypt', required: false)
   foreach func, info : arc4random_backends
-    if cc.has_function(func, args: args, prefix: info[1])
+    if cc.has_function(func, args: args, prefix: info[1],
+                       dependencies: bcrypt_dep)
       stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
+      if func == 'BCryptGenRandom'
+        deps += bcrypt_dep
+      endif
       break
     endif
   endforeach
@@ -119,12 +124,12 @@ endforeach
 if stdlib_needed
   stdlib_pragma += stdlib_func
   gen_inc += custom_target('generate_stdlib_h',
-                              input: 'stdlib.h.in',
-                              feed: true,
-                              output: 'stdlib.h',
-                              capture: true,
-                              command: [header_generator] + stdlib_pragma,
-                              install: inst_h,
-                              install_dir: h_inst_dir)
+                           input: 'stdlib.h.in',
+                           feed: true,
+                           output: 'stdlib.h',
+                           capture: true,
+                           command: [header_generator] + stdlib_pragma,
+                           install: inst_h,
+                           install_dir: h_inst_dir)
   stdlib_incdir = include_directories('.')
 endif

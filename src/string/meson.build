@@ -19,7 +19,7 @@
 # [2] = is the function needed? true/false
 #
 string = {
-  'explicit_bzero': ['explicit_bzero.c', 'explicit_bzero.3'],
+  'explicit_bzero': ['', 'explicit_bzero.3'],
   'strlcat': ['strlcat.c', 'strlcpy.3'],
   'strlcpy': ['strlcpy.c', 'strlcpy.3'],
   'strsep': ['strsep.c', 'strsep.3'],
@@ -30,6 +30,17 @@ foreach func, info : string
   string += {func: string[func] + [not cc.has_function(func,
                                                        dependencies: deps)]}
 endforeach
+
+if string['explicit_bzero'][2]
+  if cc.has_function('SecureZeroMemory', args: args,
+                     prefix: '#include <windows.h>')
+    string += {'explicit_bzero': ['explicit_bzero_SecureZeroMemory.c',
+                      string['explicit_bzero'][1], string['explicit_bzero'][2]]}
+  else
+    string += {'explicit_bzero': ['explicit_bzero.c',
+                      string['explicit_bzero'][1], string['explicit_bzero'][2]]}
+  endif
+endif
 
 string_needed = false
 string_func = []

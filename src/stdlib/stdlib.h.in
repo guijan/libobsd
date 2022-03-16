@@ -17,7 +17,8 @@
 #if !defined(H_OBSD_STDLIB)
 #define H_OBSD_STDLIB
 
-#include_next <stdlib.h>
+#define LIBOBSD_INC_NEXT stdlib.h
+#include <libobsd_inc_next.h>
 
 #pragma libobsd stdlib_uint32 #include <stdint.h>
 

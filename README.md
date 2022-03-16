@@ -29,9 +29,6 @@ foo@bar:~/libobsd$ meson setup build
 foo@bar:~/libobsd$ meson compile -C build
 ```
 
-Note that _clang-cl.exe_ is the only supported compiler in Visual Studio because
-_cl.exe_ lacks the `#include_next` GCC extension.
-
 ## Features
 ### Libbsd compatibility mode:
 ```console

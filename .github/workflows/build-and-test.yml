@@ -57,7 +57,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: dietlibc-meson-logs
+          name: meson-logs-dietlibc
           path: build/meson-logs
 
   emscripten:
@@ -71,7 +71,7 @@ jobs:
       - name: build
         run: |
           meson setup -Ddefault_library=static -Dtest_system=true build \
-              --cross-file .github/workflows/meson-emscripten.ini
+              --cross-file .github/workflows/meson-emscripten.txt
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: emscripten-meson-logs
+          name: meson-logs-emscripten
           path: build/meson-logs
 
   glibc:
@@ -101,7 +101,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: glibc-meson-logs
+          name: meson-logs-glibc
           path: build/meson-logs
 
   haiku:
@@ -127,14 +127,14 @@ jobs:
         run: vmshell meson test --no-suite system -C build
       - name: test_system
         run: vmshell meson test --suite system -C build || true
-      - name: copy failure logs
+      - name: copy falure logs
         if: failure()
         run: |
           vmshell tar -cf - build/meson-logs | tar -xf -
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: haiku-meson-logs
+          name: meson-logs-haiku
           path: build/meson-logs
 
   macos:
@@ -154,7 +154,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: macos-meson-logs
+          name: meson-logs-macos
           path: build/meson-logs
 
   msys2:
@@ -191,7 +191,7 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: ${{matrix.sys}}-meson-logs
+          name: meson-logs-${{matrix.sys}}
           path: build/meson-logs
 
   MSYS:
@@ -217,28 +217,29 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: msys2-meson-logs
+          name: meson-logs-msys2
           path: build/meson-logs
 
-  visual-studio:
-    # Reference: https://dvdhrm.github.io/2021/04/21/meson-msvc-github-actions/
+  vs:
     runs-on: windows-latest
     strategy:
       matrix:
-        uwp: [true, false]
+        cc: [clang, msvc]
+        api: [win32, uwp]
+        arch: [aarch64, amd64]
     steps:
       - uses: actions/setup-python@v2.3.1
       - run: pip install meson ninja
       - uses: actions/checkout@v2.4.0
-      - uses: ilammy/msvc-dev-cmd@v1.10.0
-        with:
-          uwp: ${{matrix.sys}}
-          spectre: true
       - name: build
         run: |
-          $env:Path += $env:VCINSTALLDIR + 'Tools\Llvm\bin;'
-          $env:CC = 'clang-cl'
-          meson setup -Dtest_system=true build
+          if ("${{matrix.api}}" -eq "uwp") {
+            $uwp = "--cross-file=.github/workflows/meson-vs-uwp.txt"
+          }
+          if ("${{matrix.arch}}" -eq "aarch64") {
+            $arm = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
+          }
+          meson setup $uwp $arm --cross-file .github/workflows/meson-vs-${{matrix.cc}}.txt --backend=vs -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -247,5 +248,5 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: vs-meson-logs
+          name: meson-logs-vs-${{matrix.arch}}-${{matrix.api}}-${{matrix.cc}}
           path: build/meson-logs

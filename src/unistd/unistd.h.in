@@ -17,7 +17,9 @@
 #if !defined(H_OBSD_UNISTD)
 #define H_OBSD_UNISTD
 
-#pragma libobsd unistd_h #include_next <unistd.h>
+#pragma libobsd unistd.h #define LIBOBSD_INC_NEXT stdlib.h
+#pragma libobsd unistd.h #include <libobsd_inc_next.h>
+
 #include <stddef.h>
 
 /*

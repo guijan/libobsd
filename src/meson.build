@@ -12,7 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-header_generator = executable('header_generator', 'header_generator.c')
+header_generator = executable('header_generator', 'header_generator.c',
+                              native: true)
 
 subdir('err')
 subdir('stdlib')
@@ -29,7 +30,13 @@ incdir += [err_incdir, stdlib_incdir, string_incdir, unistd_incdir]
 src += err_src + stdlib_src + string_src + unistd_src
 man += err_man + stdlib_man + string_man + queue_man + unistd_man
 
-def_generator = executable('def_generator', 'def_generator.c')
+incdir += include_directories('.')
+gen_inc += files('libobsd_inc_next.h')
+if inst_h
+  install_headers('libobsd_inc_next.h', subdir: h_inst_dir)
+endif
+
+def_generator = executable('def_generator', 'def_generator.c', native: true)
 def = custom_target('def_generator',
                     command: [def_generator] + funcs,
                     capture: true,

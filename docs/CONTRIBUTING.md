@@ -80,8 +80,6 @@ Browse the C runtime headers at
 [mingw-w64-headers/crt/](https://github.com/mingw-w64/mingw-w64/tree/master/mingw-w64-crt)
 and Windows system headers at
 [mingw-w64-headers/include/](https://github.com/mingw-w64/mingw-w64/tree/master/mingw-w64-crt).
-Microsoft also has a
-[UCRT alphabetical function reference](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/crt-alphabetical-function-reference?view=msvc-170).
 
 ### [MSYS2](https://github.com/msys2/msys2-runtime)
 Browse the headers at
@@ -90,6 +88,20 @@ Browse the headers at
 ### [musl](https://git.musl-libc.org/cgit/musl)
 Browse the headers at
 [include/](https://git.musl-libc.org/cgit/musl/tree/include).
+
+### Windows
+Microsoft has a
+[UCRT alphabetical function reference](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/crt-alphabetical-function-reference?view=msvc-170).
+[MSVC compiler
+options](https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170).
+I can't find MSVCRT documentation. It's best to browse MinGW headers and then
+trial and error the build in that case.
+
+The oldest supported Windows version is Windows 7 for a variety of reasons.
+When making Windows syscalls, check that they're supported by Windows 7, and
+that they're available both in "Desktop apps" and "UWP apps". The Microsoft
+documentation can be wrong here, for instance, `SecureZeroMemory()` is allowed
+in "UWP apps," but the documentation doesn't state this.
 
 ## 2nd class systems
 I was unable to get working CI for these systems, but libobsd intends to work

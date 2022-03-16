@@ -35,6 +35,14 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   deps += cc.find_library('compat')
 endif
 
+# user_args are compiler args that users of this library NEED to use.
+user_args = args
+
+# Spectre mitigations are off by default under MSVC for some ungodly reason.
+if cc.has_argument('/Qspectre')
+  args += '/Qspectre'
+endif
+
 inst_h = not meson.is_subproject()
 h_inst_dir = get_option('includedir') / 'obsd'
 # We do have global args, but I've chosen to pass them manually where they're
@@ -44,9 +52,9 @@ subdir('src')
 
 if meson.is_subproject()
   libobsd = static_library('obsd', src + gen_inc,
-                  install: false,
-                  include_directories: incdir,
-                  dependencies: deps)
+                           install: false,
+                           include_directories: incdir,
+                           dependencies: deps)
 else
   libobsd = library('obsd', src + gen_inc,
                     install: true,
@@ -66,7 +74,7 @@ else
                # default. We need to provide declarations for the OpenBSD
                # functions the system provides, the easiest way to do this is to
                # just tell the system to show all of its functions too.
-               extra_cflags: args,
+               extra_cflags: user_args,
                url: 'https://github.com/guijan/libobsd')
   if get_option('provide_libbsd')
     # https://mesonbuild.com/Pkgconfig-module.html
@@ -82,5 +90,5 @@ libobsd_dep = declare_dependency(link_with: libobsd,
                                  sources: gen_inc,
                                  dependencies: deps,
                                  include_directories: incdir,
-                                 compile_args: args)
+                                 compile_args: user_args)
 subdir('test')

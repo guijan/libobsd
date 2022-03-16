@@ -1,1 +1,1 @@
-- Add Visual Studio support (clang-cl only)
+- Add full Visual Studio support

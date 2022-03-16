@@ -14,39 +14,24 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdlib.h>
-
-/*
- * Microsoft documents RtlGenRandom here:
- * https://docs.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-rtlgenrandom
- *
- * MinGW has a declaration in ntsecapi.h
- * https://github.com/Alexpux/mingw-w64/blob/master/mingw-w64-headers/include/ntsecapi.h#L850
- *
- * Microsoft also has a declaration in ntsecapi.h
- * https://github.com/tpn/winsdk-10/blob/master/Include/10.0.14393.0/um/NTSecAPI.h#L4016-L4017
- * However, Microsoft's declaration is inside a macro conditional.
- * This page documents _WIN32_WINNT:
- * https://docs.microsoft.com/en-us/cpp/porting/modifying-winver-and-win32-winnt?view=msvc-170
- *
- * Annoyingly, ntsecapi.h doesn't declare the types it uses, so make sure to
- * include windows.h BEFORE including ntsecapi.h
- */
-#define _WIN32_WINNT 0x0501 /* Oldest version with SystemFunction036, XP. */
 #include <windows.h>
-#include <ntsecapi.h>
+#include <bcrypt.h>
+
+#include <stddef.h>
 
 void
 arc4random_buf(void *_buf, size_t nbytes)
 {
 	unsigned char *buf = _buf;
 	ULONG blk;
+	const ULONG rng = BCRYPT_USE_SYSTEM_PREFERRED_RNG;
 
 	while (nbytes > 0) {
 		blk = nbytes;
 		if (blk == 0)
 			blk = ~blk;
-		if (RtlGenRandom(buf, blk) == FALSE)
+
+		if (!BCRYPT_SUCCESS(BCryptGenRandom(NULL, buf, blk, rng)))
 			abort();
 		buf += blk;
 		nbytes -= blk;

@@ -17,7 +17,9 @@
 #if !defined(H_OBSD_ERR)
 #define H_OBSD_ERR
 
-#pragma libobsd err_h #include_next <err.h>
+#pragma libobsd err_h #define LIBOBSD_INC_NEXT err.h
+#pragma libobsd err_h #include <libobsd_inc_next.h>
+
 #pragma libobsd verr_func #include <stdarg.h>
 
 #pragma libobsd err void err(int, const char *, ...);
