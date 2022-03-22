@@ -249,3 +249,31 @@ jobs:
         with:
           name: vs-meson-logs
           path: build/meson-logs
+
+  winelib:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2.3.1
+      - name: setup
+        run: |
+          pip install meson ninja
+          sudo apt update
+          sudo apt install wine64-development-tools wine
+      - uses: actions/checkout@v2.4.0
+      - name: build
+        run: |
+          # winegcc isn't in $PATH by default
+          PATH="$PATH":/usr/lib/wine-development
+          # LTO seems to break the winelib build.
+          meson setup --cross-file .github/workflows/meson-winelib.ini \
+              -Db_lto=false -Dtest_system=true build
+          meson compile -C build
+      - name: test
+        run: meson test --no-suite system -C build
+      - name: test_system
+        run: meson test --suite system -C build || true
+      - uses: actions/upload-artifact@v2.3.1
+        if: failure()
+        with:
+          name: winelib-meson-logs
+          path: build/meson-logs
