@@ -12,7 +12,8 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-project('libobsd', 'c', version: '1.0.0', license: 'ISC',
+project('libobsd', 'c', version: '1.0.0',
+        license: 'ISC AND BSD-3-Clause AND BSD-4-Clause',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
 args = ['-D_GNU_SOURCE']
@@ -60,6 +61,19 @@ if meson.is_subproject()
                            include_directories: incdir,
                            dependencies: deps,
                            c_args: '-DLIBOBSD_EXPORTING')
+  if host_machine.system() == 'windows' or host_machine.system() == 'cygwin'
+    custom_target('license',
+                  command: ['unix2dos'],
+                  input: 'LICENSE.txt',
+                  feed: true,
+                  output: 'LICENSE_libobsd.txt',
+                  capture: true,
+                  build_by_default: true)
+  else
+    configure_file(input: 'LICENSE.txt',
+                   output: 'LICENSE_libobsd.txt',
+                   copy: true)
+  endif
 else
   libobsd = library('obsd', src + gen_inc,
                     install: true,

@@ -51,7 +51,12 @@ is not found in the system.
 libbsd_dep = dependency('libbsd-overlay') # libbsd compat
 libbsd_dep = dependency('libobsd')        # use libobsd exclusively
 ```
-When used as a subproject, libobsd is linked statically and installs nothing.
+When used as a subproject, libobsd is linked statically and installs nothing. It
+also places a copy of the license at
+**build/subprojects/libobsd/LICENSE_libobsd.txt**. Please distribute it to
+comply with terms of the license.
+The Windows subproject depends on `unix2dos` from
+[dos2unix](https://waterlan.home.xs4all.nl/dos2unix.html).
 
 ## Contributing
 [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information about the
