@@ -55,12 +55,13 @@ if stdlib['getprogname'][2]
   }
   __progname_found = cc.links('''extern const char *__progname;
                                  int main(void) {__progname = "";}''',
-                                 name: '__progname')
+                                 name: '__progname',
+                              args: args, dependencies: deps)
   if __progname_found
     stdlib += {'getprogname': getprogname_backends['__progname']}
   else
     foreach symbol, header : getprogname_symbols
-      if cc.has_header_symbol(header, symbol, args: args)
+      if cc.has_header_symbol(header, symbol, args: args, dependencies: deps)
         stdlib += {'getprogname': getprogname_backends[symbol]}
         break
       endif
@@ -85,21 +86,18 @@ if stdlib['arc4random_buf'][2]
                                   'arc4random.3', true]}
   endif
 
-  bcrypt_dep = cc.find_library('bcrypt', required: false)
+  deps += cc.find_library('bcrypt', required: false)
   foreach func, info : arc4random_backends
     if cc.has_function(func, args: args, prefix: info[1],
-                       dependencies: bcrypt_dep)
+                       dependencies: deps)
       stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
-      if func == 'BCryptGenRandom'
-        deps += bcrypt_dep
-      endif
       break
     endif
   endforeach
 endif
 
 stdlib_needed = false
-stdlib_func = []
+stdlib_sym = []
 stdlib_src = []
 stdlib_man = []
 stdlib_incdir = []
@@ -115,14 +113,14 @@ foreach func, info : stdlib
   if func in stdlib_uint32
     stdlib_pragma = ['stdlib_uint32']
   endif
-  stdlib_func += func # build up a database of functions in the library
+  stdlib_sym += func # build up a database of symbols in the library
   stdlib_src += files(info[0])
   stdlib_man += files(info[1])
   stdlib_needed = true
 endforeach
 
 if stdlib_needed
-  stdlib_pragma += stdlib_func
+  stdlib_pragma += stdlib_sym
   gen_inc += custom_target('generate_stdlib_h',
                            input: 'stdlib.h.in',
                            feed: true,

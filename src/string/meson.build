@@ -27,12 +27,12 @@ string = {
 
 # set [2] in each array of string
 foreach func, info : string
-  string += {func: string[func] + [not cc.has_function(func,
+  string += {func: string[func] + [not cc.has_function(func, args: args,
                                                        dependencies: deps)]}
 endforeach
 
 if string['explicit_bzero'][2]
-  if cc.has_function('SecureZeroMemory', args: args,
+  if cc.has_function('SecureZeroMemory', args: args, dependencies: deps,
                      prefix: '#include <windows.h>')
     string += {'explicit_bzero': ['explicit_bzero_SecureZeroMemory.c',
                       string['explicit_bzero'][1], string['explicit_bzero'][2]]}
@@ -43,7 +43,7 @@ if string['explicit_bzero'][2]
 endif
 
 string_needed = false
-string_func = []
+string_sym = []
 string_src = []
 string_man = []
 string_incdir = []
@@ -52,7 +52,7 @@ foreach func, info : string
   if not info[2]
     continue
   endif
-    string_func += func # build up a database of functions in the library
+    string_sym += func # build up a database of symbols in the library
     string_src += files(info[0])
     string_man += files(info[1])
     string_needed = true
@@ -60,12 +60,12 @@ endforeach
 
 if string_needed
   gen_inc += custom_target('generate_string_h',
-                              input: 'string.h.in',
-                              feed: true,
-                              output: 'string.h',
-                              capture: true,
-                              command: [header_generator] + string_func,
-                              install: inst_h,
-                              install_dir: h_inst_dir)
+                           input: 'string.h.in',
+                           feed: true,
+                           output: 'string.h',
+                           capture: true,
+                           command: [header_generator] + string_sym,
+                           install: inst_h,
+                           install_dir: h_inst_dir)
   string_incdir = include_directories('.')
 endif

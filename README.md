@@ -14,10 +14,10 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 -->
 
-## Libobsd - Transparent OpenBSD compatibility library
+# Libobsd - Transparent OpenBSD compatibility library
 Libobsd is much like [libbsd](https://libbsd.freedesktop.org/wiki/).
 
-It is an attempt to write a very similar library with more modern tools and
+It is an attempt at writing a very similar library with more modern tools and
 practices to make it easy to port, maintain, and add functions to the library.
 
 ## Build instructions
@@ -53,7 +53,7 @@ libbsd_dep = dependency('libobsd')        # use libobsd exclusively
 ```
 When used as a subproject, libobsd is linked statically and installs nothing.
 
-# Contributing
-[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) contains a bit of information on
-the design of libobsd, and pointers to the documentation of the various C
+## Contributing
+[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information about the
+design of libobsd and pointers to the documentation of the various C
 implementations the library has been ported to.

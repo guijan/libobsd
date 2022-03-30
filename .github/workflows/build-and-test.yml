@@ -42,8 +42,9 @@ jobs:
       - uses: actions/setup-python@v2.3.1
       - name: setup
         run: |
-          pip install meson
-          sudo apt install -y ninja-build dietlibc-dev
+          pip install meson ninja
+          sudo apt update
+          sudo apt install -y dietlibc-dev valgrind
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -51,9 +52,9 @@ jobs:
                         -Ddefault_library=static build
           meson compile -C build
       - name: test
-        run: meson test --no-suite system -C build
+        run: meson test --wrapper valgrind --no-suite system -C build
       - name: test_system
-        run: meson test --suite system -C build || true
+        run: meson test --wrapper valgrind --suite system -C build || true
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
@@ -70,8 +71,8 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
-          meson setup -Ddefault_library=static -Dtest_system=true build \
-              --cross-file .github/workflows/meson-emscripten.txt
+          meson setup -Ddefault_library=static -Dtest_system=true \
+              --cross-file=.github/workflows/meson-emscripten.txt build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -88,11 +89,14 @@ jobs:
     steps:
       - uses: actions/setup-python@v2.3.1
       - name: setup
-        run: pip install meson ninja
+        run: |
+          pip install meson ninja
+          sudo apt update
+          sudo apt upgrade -y libasan6
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
-          meson setup -Dtest_system=true build
+          meson setup -Db_sanitize=address,undefined -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -114,6 +118,9 @@ jobs:
         run: 'container-init & timeout 600 vmshell exit 0'
       - name: 'Install packages'
         run: 'vmshell pkgman install -y meson gcc haiku_devel'
+      # Rebooting fixes https://github.com/hectorm/docker-qemu-haiku/issues/1
+      - name: 'Reboot and wait until the VM is ready'
+        run: 'vmshell shutdown -r & sleep 5 && timeout 600 vmshell sleep 5'
       - name: 'Checkout project'
         uses: 'actions/checkout@main'
       - name: 'Copy project to VM'
@@ -145,7 +152,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
-          meson setup -Dtest_system=true build
+          meson setup -Db_sanitize=address,undefined -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -176,7 +183,9 @@ jobs:
         run: |
           # Lines stolen from:
           # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
-          grep -qF '[clang32]' /etc/pacman.conf || sed -i '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' /etc/pacman.conf
+          grep -qF '[clang32]' /etc/pacman.conf || sed -i \
+              '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' \
+              /etc/pacman.conf
           pacman --noconfirm -Suuy
           pacboy --noconfirm -S --needed clang:p meson:p ninja:p
       - uses: actions/checkout@v2.4.0
@@ -229,7 +238,7 @@ jobs:
         arch: [aarch64, amd64]
     steps:
       - uses: actions/setup-python@v2.3.1
-      - run: pip install meson ninja
+      - run: pip install meson
       - uses: actions/checkout@v2.4.0
       - name: build
         run: |
@@ -239,7 +248,15 @@ jobs:
           if ("${{matrix.arch}}" -eq "aarch64") {
             $arm = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
           }
-          meson setup $uwp $arm --cross-file .github/workflows/meson-vs-${{matrix.cc}}.txt --backend=vs -Dtest_system=true build
+          if ("${{matrix.cc}}" -eq "msvc") {
+            # asan doesn't seem to be working with clang, so use it only with
+            # MSVC.
+            $build = "-Dbuildtype=debug"
+            $asan = "-Db_sanitize=address"
+          }
+          meson setup $uwp $arm $build $asan --backend=vs `
+              --cross-file .github/workflows/meson-vs-${{matrix.cc}}.txt `
+              -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -248,5 +265,5 @@ jobs:
       - uses: actions/upload-artifact@v2.3.1
         if: failure()
         with:
-          name: meson-logs-vs-${{matrix.arch}}-${{matrix.api}}-${{matrix.cc}}
+          name: meson-logs-vs-${{matrix.cc}}-${{matrix.api}}-${{matrix.arch}}
           path: build/meson-logs

@@ -14,35 +14,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <err.h>
-#include <inttypes.h>
-#include <stdlib.h>
+/* This header is internal to libobsd, do not use it in your program. */
 
-enum {
-	ITERATIONS = 1000
-};
+#if !defined(LIBOBSD_DEFINES)
+#define LIBOBSD_DEFINES
 
-int
-main(void)
-{
-	int i;
-	uint32_t halfmax = ~(uint32_t)0 / 2;
+/* PUBLIC means this symbol is a library symbol and must be exported. */
+#define PUBLIC
 
-	for (i = 0; i < ITERATIONS; i++) {
-		if (arc4random_uniform(0) != 0)
-			errx(1, "arc4random_uniform(0) != 0");
-		if (arc4random_uniform(1) != 0)
-			errx(1, "arc4random_uniform(1) != 0");
-		if (arc4random_uniform(halfmax) >= halfmax)
-			errx(1, "arc4random_uniform(%1$u) >= %1$u", halfmax);
+#if defined(_MSC_VER)
+	#undef PUBLIC
 
-		/* Does this return? I introduced a bug that made it loop
-		 * forever when I touched it to change "-upper_bound" to
-		 * "~upper_bound+1" to get around a MSVC warning.
-		 */
-		arc4random_uniform(2);
+	/*
+	 * __declspec is necessary for variables on MSVC and only supported by
+	 * MSVC and the Windows versions of Clang and GCC.
+	 */
+	#if defined(LIBOBSD_EXPORTING)
+		#define PUBLIC __declspec(dllexport)
+	#else
+		#define PUBLIC __declspec(dllimport)
+	#endif
+#endif /* defined(_MSC_VER) */
 
-		/* XXX: Test the uniform spread of the return value. */
-
-	}
-}
+#endif /* !defined(LIBOBSD_DEFINES) */

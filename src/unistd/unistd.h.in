@@ -17,8 +17,9 @@
 #if !defined(H_OBSD_UNISTD)
 #define H_OBSD_UNISTD
 
-#pragma libobsd unistd.h #define LIBOBSD_INC_NEXT stdlib.h
+#pragma libobsd unistd.h #define LIBOBSD_INC_NEXT unistd.h
 #pragma libobsd unistd.h #include <libobsd_inc_next.h>
+#pragma libobsd getopt_syms #include <libobsd_defines.h>
 
 #include <stddef.h>
 
@@ -32,5 +33,12 @@
 #pragma libobsd pledge int (pledge)(const char *, const char *);
 #pragma libobsd unveil #define unveil(unused1, unused2) ((int)0)
 #pragma libobsd unveil int (unveil)(const char *, const char *);
+
+#pragma libobsd getopt int getopt(int, char * const *, const char *);
+#pragma libobsd optarg extern PUBLIC char *optarg;
+#pragma libobsd opterr extern PUBLIC int opterr;
+#pragma libobsd optind extern PUBLIC int optind;
+#pragma libobsd optopt extern PUBLIC int optopt;
+#pragma libobsd optreset extern PUBLIC int optreset;
 
 #endif /* !defined(H_OBSD_UNISTD) */

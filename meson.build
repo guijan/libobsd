@@ -17,7 +17,7 @@ project('libobsd', 'c', version: '1.0.0', license: 'ISC',
 
 args = ['-D_GNU_SOURCE']
 deps = []
-funcs = []
+syms = []
 gen_inc = [] # generated headers
 incdir = []
 src = []
@@ -38,8 +38,12 @@ endif
 # user_args are compiler args that users of this library NEED to use.
 user_args = args
 
+if cc.get_argument_syntax() == 'msvc'
+  args += '-D_CRT_SECURE_NO_WARNINGS'
+endif
+
 # Spectre mitigations are off by default under MSVC for some ungodly reason.
-if cc.has_argument('/Qspectre')
+if cc.get_id() == 'msvc'
   args += '/Qspectre'
 endif
 
@@ -54,14 +58,16 @@ if meson.is_subproject()
   libobsd = static_library('obsd', src + gen_inc,
                            install: false,
                            include_directories: incdir,
-                           dependencies: deps)
+                           dependencies: deps,
+                           c_args: '-DLIBOBSD_EXPORTING')
 else
   libobsd = library('obsd', src + gen_inc,
                     install: true,
                     include_directories: incdir,
                     dependencies: deps,
                     vs_module_defs: def,
-                    version: meson.project_version())
+                    version: meson.project_version(),
+                    c_args: '-DLIBOBSD_EXPORTING')
   install_man(man)
   pkg = import('pkgconfig')
   pkg.generate(libobsd,

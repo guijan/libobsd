@@ -15,8 +15,8 @@ Here's a checklist:
 ## Design
 Headers are generated with a simple DSL by
 [src/header_generator.c](src/header_generator.c). It's essentially our own
-#pragma for the C language. The purpose of the DSL is to ship clean headers
-without an #ifdef forest.
+`#pragma` for the C language. The purpose of the DSL is to ship clean headers
+without an `#ifdef` forest.
 
 Every subdirectory under *src/* is named after a header. *stdlib/* for
 *stdlib.h* and *err/* for *err.h* and so on. All the functions inside each
@@ -26,8 +26,8 @@ to split each "backend" that implements a function into its own file.
 Feature detection is used unless something is impossible to detect. For
 instance, there is some manual checking for Haiku.
 
-I don't intend to implement deprecated functions like rindex(), or silly
-functions like getbsize(). I trust the underlying platform, if it is buggy, fix
+I don't intend to implement deprecated functions like `rindex()`, or silly
+functions like `getbsize()`. I trust the underlying platform, if it is buggy, fix
 the bug at the source instead of working around it.
 
 ## 1st class systems.
@@ -96,6 +96,8 @@ Microsoft has a
 options](https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options-listed-alphabetically?view=msvc-170).
 I can't find MSVCRT documentation. It's best to browse MinGW headers and then
 trial and error the build in that case.
+
+[using __declspec(dllimport)](https://docs.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport?view=msvc-170)
 
 The oldest supported Windows version is Windows 7 for a variety of reasons.
 When making Windows syscalls, check that they're supported by Windows 7, and

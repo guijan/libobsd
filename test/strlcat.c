@@ -24,25 +24,21 @@
 #include <unistd.h>
 
 enum {
-	BUFLEN = 1024
+	BUFSIZE = 1024
 };
 
 int
 main(void)
 {
-	char *buf, *cp, *ep;
+	char buf[BUFSIZE], *cp, *ep;
 	size_t len;
 
-	buf = malloc(BUFLEN);
-	if (buf == NULL)
-		err(1, "unable to allocate memory");
-
-	memset(buf, 'z', BUFLEN);
-	ep = buf + BUFLEN;
+	memset(buf, 'z', BUFSIZE);
+	ep = buf + BUFSIZE;
 
 	/* Test appending to an unterminated string. */
-	len = strlcat(buf, "abcd", BUFLEN);
-	if (len != 4 + BUFLEN)
+	len = strlcat(buf, "abcd", BUFSIZE);
+	if (len != 4 + BUFSIZE)
 		errx(1, "strlcat: failed unterminated buffer test (1a)");
 
 	/* Make sure we only wrote where expected. */
@@ -53,8 +49,8 @@ main(void)
 
 	/* Test appending to a full string. */
 	ep[-1] = '\0';
-	len = strlcat(buf, "abcd", BUFLEN);
-	if (len != 4 + BUFLEN - 1)
+	len = strlcat(buf, "abcd", BUFSIZE);
+	if (len != 4 + BUFSIZE - 1)
 		errx(1, "strlcat: failed full buffer test (2a)");
 
 	/* Make sure we only wrote where expected. */
@@ -66,7 +62,7 @@ main(void)
 	/* Test appending to an empty string. */
 	ep[-1] = 'z';
 	buf[0] = '\0';
-	len = strlcat(buf, "abcd", BUFLEN);
+	len = strlcat(buf, "abcd", BUFSIZE);
 	if (len != 4)
 		err(1, "strlcat: failed empty buffer test (3a)");
 
@@ -81,7 +77,7 @@ main(void)
 
 	/* Test appending to a NUL-terminated string. */
 	memcpy(buf, "abcd", sizeof("abcd"));
-	len = strlcat(buf, "efgh", BUFLEN);
+	len = strlcat(buf, "efgh", BUFSIZE);
 	if (len != 8)
 		err(1, "strlcat: failed empty buffer test (4a)");
 

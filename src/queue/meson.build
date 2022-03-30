@@ -66,7 +66,8 @@ queue_macros = [
 queue_man = []
 
 foreach macro : queue_macros
-  if not cc.has_header_symbol('sys/queue.h', macro)
+  if not cc.has_header_symbol('sys/queue.h', macro, args: args,
+                              dependencies: deps)
     # There's nothing to gain by slicing and dicing the header, just install the
     # whole thing if a single macro is missing.
     if inst_h

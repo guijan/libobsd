@@ -7,6 +7,7 @@ tests = {
   'errx': 'errx.c',
   'explicit_bzero': 'explicit_bzero.c',
   'freezero': 'freezero.c',
+  'getopt': 'getopt.c',
   'getprogname': 'getprogname.c',
   'pledge': 'pledge.c',
   'reallocarray': 'reallocarray.c',
@@ -22,7 +23,7 @@ tests = {
 }
 
 foreach testname, src : tests
-  if funcs.contains(testname)
+  if syms.contains(testname)
     test(testname, executable(testname, src, dependencies: libobsd_dep),
          suite: 'libobsd')
   elif get_option('test_system')

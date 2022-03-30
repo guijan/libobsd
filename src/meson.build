@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 header_generator = executable('header_generator', 'header_generator.c',
-                              native: true)
+                              c_args: args, native: true)
 
 subdir('err')
 subdir('stdlib')
@@ -25,19 +25,21 @@ subdir('unistd')
 # separately.
 subdir('queue')
 
-funcs += err_func + stdlib_func + string_func + unistd_func
+syms += err_sym + stdlib_sym + string_sym + unistd_sym
 incdir += [err_incdir, stdlib_incdir, string_incdir, unistd_incdir]
 src += err_src + stdlib_src + string_src + unistd_src
 man += err_man + stdlib_man + string_man + queue_man + unistd_man
 
 incdir += include_directories('.')
 gen_inc += files('libobsd_inc_next.h')
+gen_inc += files('libobsd_defines.h')
 if inst_h
-  install_headers('libobsd_inc_next.h', subdir: h_inst_dir)
+  install_headers('libobsd_inc_next.h', 'libobsd_defines.h', subdir: h_inst_dir)
 endif
 
-def_generator = executable('def_generator', 'def_generator.c', native: true)
+def_generator = executable('def_generator', 'def_generator.c', native: true,
+                           c_args: args)
 def = custom_target('def_generator',
-                    command: [def_generator] + funcs,
+                    command: [def_generator] + syms,
                     capture: true,
                     output: 'libobsd.def')

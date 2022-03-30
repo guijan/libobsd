@@ -38,7 +38,7 @@
  * #include_next <stdio.h>
  */
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
 	#if _MSC_VER >= 1900
 		#define LIBOBSD_INC(x) <../ucrt/x>
 	#else

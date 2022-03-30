@@ -2,6 +2,7 @@
 
 /*
  * Copyright (c) 2008, Damien Miller <djm@openbsd.org>
+ * Copyright (c) 2022, Guilherme Janczak <guilherme.janczak@yandex.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -37,8 +38,10 @@ arc4random_uniform(uint32_t upper_bound)
 	if (upper_bound < 2)
 		return 0;
 
-	/* 2**32 % x == (2**32 - x) % x */
-	min = -upper_bound % upper_bound;
+	/* 2**32 % x == (2**32 - x) % x
+	 * ~upper_bound+1 == -upper_bound. This shuts up a MSVC warning.
+	 */
+	min = (~upper_bound+1) % upper_bound;
 
 	/*
 	 * This could theoretically loop forever but each retry has

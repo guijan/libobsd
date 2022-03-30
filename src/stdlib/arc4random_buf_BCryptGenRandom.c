@@ -27,7 +27,8 @@ arc4random_buf(void *_buf, size_t nbytes)
 	const ULONG rng = BCRYPT_USE_SYSTEM_PREFERRED_RNG;
 
 	while (nbytes > 0) {
-		blk = nbytes;
+		/* Explicit cast to avoid MSVC warning. */
+		blk = (ULONG)nbytes;
 		if (blk == 0)
 			blk = ~blk;
 

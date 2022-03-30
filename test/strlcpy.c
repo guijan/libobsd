@@ -30,13 +30,8 @@ enum {
 int
 main(void)
 {
-	char *buf, *buf2, *cp, *ep;
+	char buf[BUFSIZE], buf2[BUFSIZE], *cp, *ep;
 	size_t len;
-
-	buf = malloc(BUFSIZE);
-	buf2 = malloc(BUFSIZE);
-	if (buf == NULL || buf2 == NULL)
-		err(1, "malloc");
 
 	memset(buf, 'z', BUFSIZE);
 	ep = buf + BUFSIZE;

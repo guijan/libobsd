@@ -125,7 +125,7 @@ main(void)
 		if (tmp == NULL) {
 			err(1,
 			    "(tmp = recallocarray(%p, %zu, %zu, %d)) == NULL",
-			    p, oldalloc, reallocs[i], size);
+			    (void *)p, oldalloc, reallocs[i], size);
 		}
 
 		oldsize = oldalloc * size;
@@ -133,8 +133,8 @@ main(void)
 		p = tmp;
 		if (newsize > oldsize
 		    && not_memchr(p + oldsize, 0, newsize - oldsize) != NULL) {
-			errx(1, "not_memchr(%p, 0, %zu) != NULL", p + oldsize,
-			    newsize - oldsize);
+			errx(1, "not_memchr(%p, 0, %zu) != NULL",
+			    (void *)(p + oldsize), newsize - oldsize);
 		}
 
 		arc4random_buf(p, newsize);

@@ -14,35 +14,12 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <err.h>
-#include <inttypes.h>
-#include <stdlib.h>
+#include <unistd.h>
 
-enum {
-	ITERATIONS = 1000
-};
+#include <libobsd_defines.h>
 
-int
-main(void)
-{
-	int i;
-	uint32_t halfmax = ~(uint32_t)0 / 2;
-
-	for (i = 0; i < ITERATIONS; i++) {
-		if (arc4random_uniform(0) != 0)
-			errx(1, "arc4random_uniform(0) != 0");
-		if (arc4random_uniform(1) != 0)
-			errx(1, "arc4random_uniform(1) != 0");
-		if (arc4random_uniform(halfmax) >= halfmax)
-			errx(1, "arc4random_uniform(%1$u) >= %1$u", halfmax);
-
-		/* Does this return? I introduced a bug that made it loop
-		 * forever when I touched it to change "-upper_bound" to
-		 * "~upper_bound+1" to get around a MSVC warning.
-		 */
-		arc4random_uniform(2);
-
-		/* XXX: Test the uniform spread of the return value. */
-
-	}
-}
+#pragma libobsd optarg PUBLIC char *optarg = NULL;
+#pragma libobsd opterr PUBLIC int opterr = 1;
+#pragma libobsd optind PUBLIC int optind = 1;
+#pragma libobsd optopt PUBLIC int optopt = '?';
+#pragma libobsd optreset PUBLIC int optreset = 0;

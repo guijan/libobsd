@@ -40,14 +40,15 @@ err += verr
 
 # set [2] in each array of err
 foreach func, info : err
-  err += {func: err[func] + [not cc.has_function(func, dependencies: deps)]}
+  err += {func: err[func] + [not cc.has_function(func, dependencies: deps,
+                                                 args: args)]}
 endforeach
 
 # We might need to include stdarg.h if one of the err functions that take
 # variadic arguments are needed.
 stdarg_needed = false
 
-err_func = []
+err_sym = []
 err_src = []
 err_man = []
 err_incdir = []
@@ -62,16 +63,16 @@ foreach func, info : err
   if func in verr
     stdarg_needed = true
   endif
-  err_func += func # build up a database of functions in the library
+  err_sym += func # build up a database of symbols in the library
   err_src += files(info[0])
   err_man += files(info[1])
   err_needed = true
 endforeach
 
 if err_needed
-  err_pragma += err_func
-  if cc.has_header('err.h')
-    err_pragma += 'err_h'
+  err_pragma += err_sym
+  if cc.has_header('err.h', args: args, dependencies: deps)
+    err_pragma += 'err.h'
   endif
   if stdarg_needed
     err_pragma += 'verr_func'
