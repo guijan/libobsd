@@ -1,4 +1,4 @@
-Changes in libobsd master:
+Changes in libobsd 1.1.0:
 
 - Add full Visual Studio support
 - Add cross compilation support
@@ -13,4 +13,5 @@ Changes in libobsd master:
   the platform if we're a subproject
 - Properly fill Meson's `license:` kwarg in `project()` call
 - Add Windows AArch8 support.
+- Remove the wrap file from the tree, let the WrapDB handle it
 

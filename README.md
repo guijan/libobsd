@@ -41,8 +41,8 @@ through
 libobsd implements the used functions.
 
 ### Meson subproject
-There's a wrap file at [libobsd.wrap](libobsd.wrap) that provides **libobsd**
-and **libbsd-overlay** dependencies.
+The subproject provides **libobsd** and **libbsd-overlay** dependencies and is
+available in the [WrapDB](https://mesonbuild.com/Wrapdb-projects.html).
 As
 [the Meson documentation](https://mesonbuild.com/Wrap-dependency-system-manual.html#provide-section)
 describes, Meson will automatically fallback to the subproject if the dependency

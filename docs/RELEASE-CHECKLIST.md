@@ -17,6 +17,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 - [ ] decide on the new semantic version number, represented by `$VERSION`
 - [ ] set `revision` in [libobsd.wrap](libobsd.wrap) to `$VERSION`
 - [ ] set `version` in [meson.build](meson.build)'s project() call to `$VERSION`
+- [ ] Make sure docs/CHANGELOG.md ends with a blank line and has "changes in
+      libobsd `$VERSION`" written at the top
 - [ ] git mv docs/CHANGELOG.md docs/CHANGELOG-`$VERSION`.md
 - [ ] git commit -m 'prepare for `$VERSION`'
 - [ ] git checkout master && git merge `$BRANCH`
