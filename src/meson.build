@@ -34,7 +34,7 @@ incdir += include_directories('.')
 gen_inc += files('libobsd_inc_next.h')
 gen_inc += files('libobsd_defines.h')
 if inst_h
-  install_headers('libobsd_inc_next.h', 'libobsd_defines.h', subdir: h_inst_dir)
+  install_headers('libobsd_inc_next.h', 'libobsd_defines.h', subdir: 'obsd')
 endif
 
 def_generator = executable('def_generator', 'def_generator.c', native: true,
