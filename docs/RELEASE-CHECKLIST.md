@@ -15,7 +15,6 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 -->
 
 - [ ] decide on the new semantic version number, represented by `$VERSION`
-- [ ] set `revision` in [libobsd.wrap](libobsd.wrap) to `$VERSION`
 - [ ] set `version` in [meson.build](meson.build)'s project() call to `$VERSION`
 - [ ] Make sure docs/CHANGELOG.md ends with a blank line and has "changes in
       libobsd `$VERSION`" written at the top
@@ -25,3 +24,8 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 - [ ] git tag -m 'libobsd `$VERSION`' `v$VERSION`
 
 Remember: a version is only preceded by a 'v' in the tag name and nowhere else.
+
+After pushing:
+
+- [ ] update the WrapDB file
+- [ ] update the OpenWRT package
