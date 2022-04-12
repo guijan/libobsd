@@ -1,32 +1,4 @@
-.\" $OpenBSD: arc4random.3,v 1.37 2019/09/29 16:30:35 jmc Exp $
-.\"
-.\" Copyright 1997 Niels Provos <provos@physnet.uni-hamburg.de>
-.\" All rights reserved.
-.\"
-.\" Redistribution and use in source and binary forms, with or without
-.\" modification, are permitted provided that the following conditions
-.\" are met:
-.\" 1. Redistributions of source code must retain the above copyright
-.\"    notice, this list of conditions and the following disclaimer.
-.\" 2. Redistributions in binary form must reproduce the above copyright
-.\"    notice, this list of conditions and the following disclaimer in the
-.\"    documentation and/or other materials provided with the distribution.
-.\" 3. All advertising materials mentioning features or use of this software
-.\"    must display the following acknowledgement:
-.\"      This product includes software developed by Niels Provos.
-.\" 4. The name of the author may not be used to endorse or promote products
-.\"    derived from this software without specific prior written permission.
-.\"
-.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
-.\" IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-.\" OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
-.\" IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
-.\" INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-.\" NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-.\" DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-.\" THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-.\" (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-.\" THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+.\"	$OpenBSD: mdoc.template,v 1.15 2014/03/31 00:09:54 dlg Exp $
 .\"
 .\" Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
 .\"
@@ -42,78 +14,76 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: Feb 2 2022 $
+.Dd $Mdocdate: April 13 2022 $
 .Dt ARC4RANDOM 3
 .Os
 .Sh NAME
 .Nm arc4random ,
 .Nm arc4random_buf ,
 .Nm arc4random_uniform
-.Nd random number generator
+.Nd all-purpose random
 .Sh SYNOPSIS
 .In stdlib.h
 .Ft uint32_t
 .Fn arc4random "void"
 .Ft void
-.Fn arc4random_buf "void *buf" "size_t nbytes"
+.Fn arc4random_buf "void *buf" "size_t len"
 .Ft uint32_t
-.Fn arc4random_uniform "uint32_t upper_bound"
+.Fn arc4random_uniform "uint32_t less_than"
 .Sh DESCRIPTION
-This family of functions provides higher quality data than those
-described in
-.Xr rand 3 ,
-.Xr random 3 ,
-and
-.Xr rand48 3 .
-.Pp
-Use of these functions is encouraged for almost all random number
-consumption because the other interfaces are deficient in either
-quality, portability, standardization, or availability.
-These functions can be called in almost all coding environments,
-including
-.Xr pthreads 3
-and
-.Xr chroot 2 .
-.Pp
-High quality pseudo-random numbers are generated very quickly.
-.Pp
 The
+.Fn arc4random ,
+.Fn arc4random_buf , and
+.Fn arc4random_uniform
+functions return high quality random numbers with acceptable performance.
+They never fail, block, or return low quality numbers.
+The functions are thread-safe, chroot-safe,
+and do not return the same results between the parent and child processes in a
+.Fn fork .
+.Sh RETURN VALUES
 .Fn arc4random
-function returns a single 32-bit value.
+returns a random number between 0 inclusive and UINT32_MAX inclusive.
 .Pp
 .Fn arc4random_buf
-fills the region
+fills the object pointed to by
 .Fa buf
-of length
-.Fa nbytes
-with random data.
+with
+.Fa len
+random bytes.
 .Pp
 .Fn arc4random_uniform
-will return a single 32-bit value, uniformly distributed but less than
-.Fa upper_bound .
-This is recommended over constructions like
-.Dq Li arc4random() % upper_bound
-as it avoids "modulo bias" when the upper bound is not a power of two.
-In the worst case, this function may consume multiple iterations
-to ensure uniformity; see the source code to understand the problem
-and solution.
-.Sh RETURN VALUES
-These functions are always successful, and no return value is
-reserved to indicate an error.
-.Sh SEE ALSO
-.Xr rand 3 ,
-.Xr rand48 3 ,
-.Xr random 3
-.Sh HISTORY
-These functions first appeared in
-.Ox 2.1 .
+returns a random number between 0 inclusive and
+.Fa less_than
+exclusive.
+.Sh EXAMPLES
+The
+.Fn arc4random_uniform
+function exists to avoid a problem known as
+.Em modulo bias :
+when the 1st argument of the modulo operator is a random number and the 2nd
+is a number that cannot divide the RNG's largest possible return value plus
+one,
+some numbers are more likely to occur than others in the result.
+In the case of
+.Fn arc4random ,
+any modulo operator second operand that is not a power of 2 causes modulo bias.
 .Pp
-The original version of this random number generator used the
-RC4 (also known as ARC4) algorithm.
-In
-.Ox 5.5
-it was replaced with the ChaCha20 cipher, and it may be replaced
-again in the future as cryptographic techniques advance.
-libobsd implements it by calling the underlying system's RNG API.
-A good mnemonic is
-.Qq A Replacement Call for Random .
+Do not use the following construct to generate a number between 0 and 9:
+.Bd -literal -offset indent
+n = arc4random() % 10;
+.Ed
+.Pp
+Instead, replace the modulo operator with
+.Fn arc4random_uniform() :
+.Bd -literal -offset indent
+n = arc4random_uniform(10);
+.Ed
+.Pp
+To generate a random number between 45 inclusive and 86 exclusive, use:
+.Bd -literal -offset indent
+n = 45 + arc4random_uniform(86-45);
+.Ed
+.Sh BUGS
+Haiku OS lacks a cryptographic API; under Haiku OS,
+these functions require access to
+.Pa /dev/urandom .

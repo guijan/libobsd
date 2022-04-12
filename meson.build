@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 project('libobsd', 'c', version: '1.1.1',
-        license: 'ISC AND BSD-3-Clause AND BSD-4-Clause',
+        license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
 args = ['-D_GNU_SOURCE']
