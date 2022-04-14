@@ -20,6 +20,7 @@
 #
 stdlib = {
   'arc4random_buf': ['', 'arc4random.3'],
+  'daemon': ['', 'daemon.3'],
   'freezero': ['freezero.c', 'freezero.3'],
   'getprogname': ['', 'getprogname.3'],
   'reallocarray': ['reallocarray.c', 'reallocarray.3'],
@@ -41,33 +42,6 @@ foreach func, info : stdlib
                                dependencies: deps)
   stdlib += {func: stdlib[func] + [not func_found]}
 endforeach
-
-if stdlib['getprogname'][2]
-  short_name = 'program_invocation_short_name'
-  getprogname_backends = {
-    '_pgmptr': ['getprogname__pgmptr.c', 'getprogname.3', true],
-    '__progname': ['getprogname___progname.c', 'getprogname.3', true],
-    short_name: ['getprogname_' + short_name + '.c', 'getprogname.3', true],
-  }
-  getprogname_symbols = {
-    '_pgmptr': 'stdlib.h',
-    short_name: 'errno.h'
-  }
-  __progname_found = cc.links('''extern const char *__progname;
-                                 int main(void) {__progname = "";}''',
-                                 name: '__progname',
-                              args: args, dependencies: deps)
-  if __progname_found
-    stdlib += {'getprogname': getprogname_backends['__progname']}
-  else
-    foreach symbol, header : getprogname_symbols
-      if cc.has_header_symbol(header, symbol, args: args, dependencies: deps)
-        stdlib += {'getprogname': getprogname_backends[symbol]}
-        break
-      endif
-    endforeach
-  endif
-endif
 
 if stdlib['arc4random_buf'][2]
   arc4random_backends = {
@@ -94,6 +68,61 @@ if stdlib['arc4random_buf'][2]
       break
     endif
   endforeach
+endif
+
+if stdlib['daemon'][2]
+  daemon_functions = ['fork', '_exit', 'setsid', 'chdir', 'open', 'dup2']
+  # openbsd    has daemon() declared in stdlib.h
+  # glibc      has daemon() declared in unistd.h
+  # dietlibc   has daemon() declared in daemon.h
+  if cc.has_function('daemon', args: args, prefix: '#include <unistd.h>',
+                     dependencies: deps) or \
+     cc.has_function('daemon', args: args, prefix: '#include <daemon.h>',
+                     dependencies: deps)
+    stdlib += {'daemon': ['daemon_null.c', 'daemon.3', true]}
+  endif
+
+  has_daemon_funcs = true
+  foreach func : daemon_functions
+    if not cc.has_function(func, args: args, dependencies: deps,
+                           prefix: '''#include <unistd.h>
+                                      #include <fcntl.h>''')
+      has_daemon_funcs = false
+    endif
+  endforeach
+  if has_daemon_funcs
+    stdlib += {'daemon': ['daemon.c', 'daemon.3', true]}
+  elif cc.has_function('FreeConsole', args: args, dependencies: deps,
+                       prefix: '#include <windows.h>')
+    stdlib += {'daemon': ['daemon_win.c', 'daemon.3', true]}
+  endif
+endif
+
+if stdlib['getprogname'][2]
+  short_name = 'program_invocation_short_name'
+  getprogname_backends = {
+    '_pgmptr': ['getprogname__pgmptr.c', 'getprogname.3', true],
+    '__progname': ['getprogname___progname.c', 'getprogname.3', true],
+    short_name: ['getprogname_' + short_name + '.c', 'getprogname.3', true],
+  }
+  getprogname_symbols = {
+    '_pgmptr': 'stdlib.h',
+    short_name: 'errno.h'
+  }
+  __progname_found = cc.links('''extern const char *__progname;
+                                 int main(void) {__progname = "";}''',
+                                 name: '__progname',
+                              args: args, dependencies: deps)
+  if __progname_found
+    stdlib += {'getprogname': getprogname_backends['__progname']}
+  else
+    foreach symbol, header : getprogname_symbols
+      if cc.has_header_symbol(header, symbol, args: args, dependencies: deps)
+        stdlib += {'getprogname': getprogname_backends[symbol]}
+        break
+      endif
+    endforeach
+  endif
 endif
 
 stdlib_needed = false

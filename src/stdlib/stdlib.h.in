@@ -26,6 +26,8 @@
 #pragma libobsd arc4random_buf void arc4random_buf(void *, size_t);
 #pragma libobsd arc4random_uniform uint32_t arc4random_uniform(uint32_t);
 
+#pragma libobsd daemon int daemon(int, int);
+
 #pragma libobsd getprogname const char *getprogname(void);
 
 #pragma libobsd freezero void freezero(void *, size_t);
