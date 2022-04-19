@@ -1,0 +1,138 @@
+.\"	$OpenBSD: mdoc.template,v 1.15 2014/03/31 00:09:54 dlg Exp $
+.\"
+.\" Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: April 20 2022 $
+.Dt SETPROCTITLE 3
+.Os
+.Sh NAME
+.Nm setproctitle ,
+.Nm setproctitle_init
+.Nd set process title
+.Sh SYNOPSIS
+.In stdlib.h
+.Fd #if defined(LIBOBSD_SETPROCTITLE_INIT)
+.Ft void
+.Fn setproctitle_init "int argc" "char *argv[]" "char *envp[]"
+.Fd #endif
+.Ft void
+.Fn setproctitle "const char *fmt" "..."
+.Sh DESCRIPTION
+The
+.Fn setproctitle_init
+function is a necessary evil in this
+.Ox
+compatibility library.
+If
+.Dv LIBOBSD_SETPROCTITLE_INIT
+is defined,
+call
+.Fn setproctitle_init
+in your
+.Fn main
+function before using
+.Fa argc ,
+.Fa argv ,
+or the environment.
+.Fa envp
+should be the global variable
+.Va environ .
+.Pp
+The
+.Fn setproctitle
+function sets the process' title; the title is set to the program's name as
+returned by
+.Xr getprogname 3
+followed by a colon, a space, and the output of
+.Xr vsnprintf 3
+when passed
+.Fa fmt
+and the variable arguments.
+The title is limited to 2048 bytes.
+.Pp
+If
+.Fa fmt
+is
+.Dv NULL ,
+the title is set to the program's name.
+.Pp
+If
+.Fn setproctitle
+is called before
+.Fn setproctitle_init ,
+it is no-op.
+.Fn setproctitle_init
+is compatible with libbsd.
+.Sh EXAMPLES
+Here's a complete program which should build unmodified across
+.Ox
+itself as
+well as Linux, Windows, Mac OS, and all other operating systems officially
+supported by libobsd, and which showcases the usage of
+.Fn setproctitle :
+.Bd -literal
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int
+main(int argc, char *argv[])
+{
+	int ch;
+	char *tflag;
+
+#if defined(LIBOBSD_SETPROCTITLE_INIT)
+	extern char **environ;
+	setproctitle_init(argc, argv, environ);
+#endif
+
+	tflag = NULL;
+	while ((ch = getopt(argc, argv, "t:")) != -1) {
+		switch(ch) {
+		case 't':
+			tflag = optarg;
+			break;
+		default:
+			exit(1);
+		}
+	}
+
+	if (tflag == NULL)
+		setproctitle(NULL);
+	else
+		setproctitle("%s", tflag);
+	fputs("Press enter to exit: ", stdout);
+	fflush(stdout);
+	getchar();
+}
+.Ed
+.Sh SEE ALSO
+.Xr getprogname 3 ,
+.Xr vsnprintf 3
+.Sh CAVEATS
+.Fn setproctitle_init
+is a necessary libbsd extension.
+.Pp
+.Dv LIBOBSD_SETPROCTITLE_INIT
+is a libobsd extension to
+.Fn setproctitle_init .
+.Pp
+The process' title may be truncated to less than 2048 bytes in some cases.
+.Pp
+A
+.Fn setproctitle NULL
+call doesn't set the title to the original title.
+The original title might have contained the arguments passed to the program, for
+instance.

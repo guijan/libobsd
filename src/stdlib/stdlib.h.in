@@ -35,6 +35,10 @@
 #pragma libobsd recallocarray void *recallocarray(void *, size_t, size_t,
 #pragma libobsd recallocarray                     size_t);
 
+#pragma libobsd setproctitle_init #define LIBOBSD_SETPROCTITLE_INIT
+#pragma libobsd setproctitle_init void setproctitle_init(int, char **, char **);
+#pragma libobsd setproctitle void setproctitle(const char *, ...);
+
 #pragma libobsd strtonum long long strtonum(const char *, long long, long long,
 #pragma libobsd strtonum                    const char **);
 

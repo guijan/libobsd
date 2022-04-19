@@ -25,6 +25,7 @@ stdlib = {
   'getprogname': ['', 'getprogname.3'],
   'reallocarray': ['reallocarray.c', 'reallocarray.3'],
   'recallocarray': ['recallocarray.c', 'recallocarray.3'],
+  'setproctitle': ['', 'setproctitle.3'],
   'strtonum': ['strtonum.c', 'strtonum.3'],
 }
 
@@ -72,9 +73,9 @@ endif
 
 if stdlib['daemon'][2]
   daemon_functions = ['fork', '_exit', 'setsid', 'chdir', 'open', 'dup2']
-  # openbsd    has daemon() declared in stdlib.h
-  # glibc      has daemon() declared in unistd.h
-  # dietlibc   has daemon() declared in daemon.h
+  # openbsd  has daemon() declared in stdlib.h
+  # glibc    has daemon() declared in unistd.h
+  # dietlibc has daemon() declared in daemon.h
   if cc.has_function('daemon', args: args, prefix: '#include <unistd.h>',
                      dependencies: deps) or \
      cc.has_function('daemon', args: args, prefix: '#include <daemon.h>',
@@ -125,8 +126,24 @@ if stdlib['getprogname'][2]
   endif
 endif
 
-stdlib_needed = false
 stdlib_sym = []
+
+if stdlib['setproctitle'][2]
+  if cc.has_function('SetConsoleTitle', args: args,
+                     prefix: '#include <windows.h>', dependencies: deps)
+    setproctitle_backend = 'setproctitle_SetConsoleTitle.c'
+  elif host_machine.system() == 'emscripten'
+    setproctitle_backend = 'setproctitle_emscripten.c'
+  else
+    # This is an ugly hack, but it's implemented in standard C and works on
+    # multiple OSes, so it either works or does nothing meaningful.
+    setproctitle_backend = 'setproctitle_argv.c'
+    stdlib_sym += 'setproctitle_init'
+  endif
+  stdlib += {'setproctitle': [setproctitle_backend, 'setproctitle.3', true]}
+endif
+
+stdlib_needed = false
 stdlib_src = []
 stdlib_man = []
 stdlib_incdir = []

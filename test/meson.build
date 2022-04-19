@@ -27,6 +27,7 @@ tests = {
   'pledge': 'pledge.c',
   'reallocarray': 'reallocarray.c',
   'recallocarray': 'recallocarray.c',
+  'setproctitle': 'setproctitle.c',
   'strlcat': 'strlcat.c',
   'strlcpy': 'strlcpy.c',
   'strsep': 'strsep.c',
