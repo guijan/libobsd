@@ -61,7 +61,10 @@ if stdlib['arc4random_buf'][2]
                                   'arc4random.3', true]}
   endif
 
-  deps += cc.find_library('bcrypt', required: false)
+  bcrypt_dep = cc.find_library('bcrypt', required: false)
+  if bcrypt_dep.found()
+    deps += bcrypt_dep
+  endif
   foreach func, info : arc4random_backends
     if cc.has_function(func, args: args, prefix: info[1],
                        dependencies: deps)

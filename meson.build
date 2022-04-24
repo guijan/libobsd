@@ -16,7 +16,7 @@ project('libobsd', 'c', version: '1.1.1',
         license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
-args = ['-D_GNU_SOURCE']
+args = []
 deps = []
 syms = []
 gen_inc = [] # generated headers
@@ -33,7 +33,13 @@ if host_machine.system() == 'haiku'
 elif host_machine.system() == 'netbsd'
   args += ['-D_OPENBSD_SOURCE']
 elif cc.has_header_symbol('features.h', '__dietlibc__')
+  args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
   deps += cc.find_library('compat')
+elif cc.has_header_symbol('features.h', '__GLIBC__')
+  # Some libcs might set __GLIBC__ in features.h to try to imitate glibc and
+  # improve compatbility with other programs. Make sure we test for glibc last
+  # for this reason.
+  args += ['-D_DEFAULT_SOURCE']
 endif
 
 # user_args are compiler args that users of this library NEED to use.

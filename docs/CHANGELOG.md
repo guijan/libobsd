@@ -5,4 +5,5 @@ Changes in libobsd master:
 - add daemon()
 - add setproctitle()
 - add CompCert build testing
+-  use feature test macros and meson deps strictly
 
