@@ -1,0 +1,6 @@
+[built-in options]
+c_std = 'c99'
+default_library = 'static'
+
+[binaries]
+c = 'ccomp'

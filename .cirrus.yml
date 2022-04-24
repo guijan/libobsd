@@ -21,7 +21,10 @@
 
 common_template: &common_script
   build_script:
-    - meson setup -Dtest_system=true build
+    - if command -v ccomp; then
+    -   export native_file=--native-file=.github/workflows/meson-compcert.txt
+    - fi
+    - meson setup $native_file -Dtest_system=true build
     - meson compile -C build
   test_script:
     - meson test --no-suite system -C build
@@ -35,12 +38,27 @@ common_template: &common_script
 
 task:
   container:
-    image: kcubeterm/termux:x86_64
+    image: alpine:latest
     kvm: true
-  name: bionic
+  name: musl
   setup_script:
-    - pkg install -y ninja clang python
-    - pip install meson
+    - apk add meson alpine-sdk clang
+  << : *common_script
+
+task:
+  container:
+    image: artixlinux/base
+    kvm: true
+  name: compcert
+  aur_script:
+    - printf '%s\n%s\n' '[xuanrui]'
+             'Server = https://www.math.nagoya-u.ac.jp/~x18004y/repo/'
+             >> /etc/pacman.conf
+    - pacman-key --init
+    - pacman-key --recv-keys 6E06FBC8
+    - pacman-key --lsign-key 6E06FBC8
+  setup_script:
+    - pacman --noconfirm -Syu compcert ninja meson git
   << : *common_script
 
 task:
@@ -54,9 +72,10 @@ task:
 
 task:
   container:
-    image: alpine:latest
+    image: kcubeterm/termux:x86_64
     kvm: true
-  name: musl
+  name: bionic
   setup_script:
-    - apk add meson alpine-sdk clang
+    - pkg install -y ninja clang python
+    - pip install meson
   << : *common_script

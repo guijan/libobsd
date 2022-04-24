@@ -4,4 +4,5 @@ Changes in libobsd master:
 - Replace BSD-4-Clause licensed sources
 - add daemon()
 - add setproctitle()
+- add CompCert build testing
 
