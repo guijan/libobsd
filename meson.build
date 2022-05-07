@@ -37,7 +37,7 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   deps += cc.find_library('compat')
 elif cc.has_header_symbol('features.h', '__GLIBC__')
   # Some libcs might set __GLIBC__ in features.h to try to imitate glibc and
-  # improve compatbility with other programs. Make sure we test for glibc last
+  # improve compatibility with other programs. Make sure we test for glibc last
   # for this reason.
   args += ['-D_DEFAULT_SOURCE']
 endif

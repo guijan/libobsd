@@ -46,7 +46,7 @@ I don't intend to implement deprecated functions like `rindex()`, or silly
 functions like `getbsize()`. I trust the underlying platform, if it is buggy, fix
 the bug at the source instead of working around it.
 
-## 1st class systems.
+## Tier 1 systems.
 It's very easy to support all the systems in this category because we have
 working CI for them.
 
@@ -105,6 +105,9 @@ Browse the headers at
 Browse the headers at
 [include/](https://git.musl-libc.org/cgit/musl/tree/include).
 
+### [NetBSD](http://cvsweb.netbsd.org/bsdweb.cgi/?only_with_tag=MAIN)
+See [man.netbsd.org](https://man.netbsd.org).
+
 ### Windows
 Microsoft has a
 [UCRT alphabetical function reference](https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/crt-alphabetical-function-reference?view=msvc-170).
@@ -121,7 +124,7 @@ that they're available both in "Desktop apps" and "UWP apps". The Microsoft
 documentation can be wrong here, for instance, `SecureZeroMemory()` is allowed
 in "UWP apps," but the documentation doesn't state this.
 
-## 2nd class systems
+## Tier 2 systems
 I was unable to get working CI for these systems, but libobsd intends to work
 with them.
 
@@ -130,9 +133,6 @@ with them.
 
 ### [Illumos](https://github.com/illumos/illumos-gate)
 Browse the [man pages](https://illumos.org/man).
-
-### [NetBSD](http://cvsweb.netbsd.org/bsdweb.cgi/?only_with_tag=MAIN)
-See [man.netbsd.org](https://man.netbsd.org).
 
 ### [uclibc-ng](https://gogs.waldemar-brodkorb.de/oss/uclibc-ng)
 Browse the headers at

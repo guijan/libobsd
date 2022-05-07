@@ -36,6 +36,10 @@ if string['explicit_bzero'][2]
                      prefix: '#include <windows.h>')
     string += {'explicit_bzero': ['explicit_bzero_SecureZeroMemory.c',
                       string['explicit_bzero'][1], string['explicit_bzero'][2]]}
+  elif cc.has_function('explicit_memset', args: args, dependencies: deps,
+                     prefix: '#include <string.h>')
+    string += {'explicit_bzero': ['explicit_bzero_explicit_memset.c',
+                      string['explicit_bzero'][1], string['explicit_bzero'][2]]}
   else
     string += {'explicit_bzero': ['explicit_bzero.c',
                       string['explicit_bzero'][1], string['explicit_bzero'][2]]}
