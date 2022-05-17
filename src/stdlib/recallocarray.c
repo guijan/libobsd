@@ -19,38 +19,34 @@
 /* OPENBSD ORIGINAL: lib/libc/stdlib/recallocarray.c */
 
 #include <errno.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-/*
- * This is sqrt(SIZE_MAX+1), as s1*s2 <= SIZE_MAX
- * if both s1 < MUL_NO_OVERFLOW and s2 < MUL_NO_OVERFLOW
- */
-#define MUL_NO_OVERFLOW ((size_t)1 << (sizeof(size_t) * 4))
-
 void *
 recallocarray(void *ptr, size_t oldnmemb, size_t newnmemb, size_t size)
 {
-	size_t oldsize, newsize;
+	size_t oldsize, newsize, newalloc;
 	void *newptr;
 
-	if ((newnmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
-	    newnmemb > 0 && SIZE_MAX / newnmemb < size) {
+	if (size == 0) /* Try again, but without a division by 0. */
+		return recallocarray(ptr, 0, 0, 1);
+
+	newsize = size * newnmemb;
+	if (newsize / size != newnmemb) {
 		errno = ENOMEM;
 		return NULL;
 	}
-	newsize = newnmemb * size;
-	if (ptr == NULL)
-		return calloc(newsize > 0 ? newsize : 1, 1);
+	newalloc = newsize > 0 ? newsize : 1;
 
-	if ((oldnmemb >= MUL_NO_OVERFLOW || size >= MUL_NO_OVERFLOW) &&
-	    oldnmemb > 0 && SIZE_MAX / oldnmemb < size) {
+	if (ptr == NULL)
+		return calloc(newalloc, 1);
+
+	oldsize = size * oldnmemb;
+	if (oldsize / size != oldnmemb) {
 		errno = EINVAL;
 		return NULL;
 	}
-	oldsize = oldnmemb * size;
 
 	/*
 	 * Don't bother too much if we're shrinking just a bit,
@@ -65,18 +61,18 @@ recallocarray(void *ptr, size_t oldnmemb, size_t newnmemb, size_t size)
 		}
 	}
 
-	newptr = malloc(newsize > 0 ? newsize : 1);
+	newptr = malloc(newalloc);
 	if (newptr == NULL)
 		return NULL;
 
 	if (newsize > oldsize) {
 		memcpy(newptr, ptr, oldsize);
 		explicit_bzero((char *)newptr + oldsize, newsize - oldsize);
-	} else
+	} else {
 		memcpy(newptr, ptr, newsize);
+	}
 
-	explicit_bzero(ptr, oldsize);
-	free(ptr);
+	freezero(ptr, oldsize);
 
 	return newptr;
 }

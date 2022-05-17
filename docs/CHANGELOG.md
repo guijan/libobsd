@@ -7,4 +7,5 @@ Changes in libobsd master:
 - Add CompCert build testing
 - Use feature test macros and meson deps strictly
 - Add NetBSD support
+- Simplify reallocarray, recallocarray, reducing source/machine code size
 
