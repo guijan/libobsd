@@ -29,36 +29,42 @@ foo@bar:~/libobsd$ meson setup build
 foo@bar:~/libobsd$ meson compile -C build
 ```
 
+To compile with Visual Studio, use Meson's Visual Studio backend.
+```console
+C:\Users\foo\libobsd> meson setup --backend=vs build
+C:\Users\foo\libobsd> meson compile -C build
+```
+
 ## Features
-### Libbsd compatibility mode:
+### Portability
+Libobsd is highly portable. Linux (musl, glibc, dietlibc, Bionic), HaikuOS,
+NetBSD, Mac, Windows (MinGW, Cygwin, Visual Studio), and many other platforms
+are officially supported.
+The intent is to support every single system supported by Meson.
+
+### Libbsd compatibility mode
 ```console
 foo@bar:~/libobsd$ meson configure -Dprovide_libbsd=true build
 ```
-The compatibility mode installs a _libbsd-overlay.pc_ pkg-config definition
-which is a symlink to _libobsd.pc_. It should make projects that find libbsd
-through
-[pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) work if
-libobsd implements the used functions.
+The compatibility mode installs a _libbsd-overlay.pc_ pkg-config definition.
+It should make projects that find libbsd through
+[pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) compile and
+run against libobsd.
 
 ### Meson subproject
-The subproject provides **libobsd** and **libbsd-overlay** dependencies and is
-available in the [WrapDB](https://mesonbuild.com/Wrapdb-projects.html).
+Libobsd is available in the
+[WrapDB](https://mesonbuild.com/Wrapdb-projects.html).
 As
 [the Meson documentation](https://mesonbuild.com/Wrap-dependency-system-manual.html#provide-section)
-describes, Meson will automatically fallback to the subproject if the dependency
-is not found in the system.
-```meson
-libbsd_dep = dependency('libbsd-overlay') # libbsd compat
-libbsd_dep = dependency('libobsd')        # use libobsd exclusively
-```
-When used as a subproject, libobsd is linked statically and installs nothing. It
-also places a copy of the license at
-**build/subprojects/libobsd/LICENSE_libobsd.txt**. Please distribute it to
-comply with terms of the license.
-The Windows subproject depends on `unix2dos` from
-[dos2unix](https://waterlan.home.xs4all.nl/dos2unix.html).
+describes, Meson will automatically download and compile the subproject if the
+dependency is not found in the system.
+
+## Usage
+The [docs/USAGE.md](docs/USAGE.md) file contains complete instructions about
+programming against libobsd and supporting both libbsd and libobsd. If the usage
+instructions are lacking, open an issue.
 
 ## Contributing
-[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information about the
-design of libobsd and pointers to the documentation of the various C
+The [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) file contains information about
+the design of libobsd and pointers to the documentation of the various C
 implementations the library has been ported to.

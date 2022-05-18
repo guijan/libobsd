@@ -8,4 +8,5 @@ Changes in libobsd master:
 - Use feature test macros and meson deps strictly
 - Add NetBSD support
 - Simplify reallocarray, recallocarray, reducing source/machine code size
+- Expand the documentation
 
