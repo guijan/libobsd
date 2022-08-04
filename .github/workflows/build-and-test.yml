@@ -109,8 +109,8 @@ jobs:
           path: build/meson-logs
 
   haiku:
-    runs-on: ubuntu-latest
-    container: docker.io/hectormolinero/qemu-haiku:latest
+    runs-on: ubuntu-22.04
+    container: 'docker.io/hectorm/qemu-haiku:latest'
     steps:
       # Copied from: https://github.com/hectorm/docker-qemu-haiku#github-actions
       # Notice I changed make to meson in the 'Install packages' step.
@@ -118,13 +118,10 @@ jobs:
         run: 'container-init & timeout 600 vmshell exit 0'
       - name: 'Install packages'
         run: 'vmshell pkgman install -y meson gcc haiku_devel'
-      # Rebooting fixes https://github.com/hectorm/docker-qemu-haiku/issues/1
-      - name: 'Reboot and wait until the VM is ready'
-        run: 'vmshell shutdown -r & sleep 5 && timeout 600 vmshell sleep 5'
       - name: 'Checkout project'
         uses: 'actions/checkout@main'
       - name: 'Copy project to VM'
-        run: 'sleep 5 && vmshell mkdir ./src/; tar -cf - ./ | vmshell tar -xf - -C ./src/'
+        run: 'vmshell mkdir ./src/; tar -cf - ./ | vmshell tar -xf - -C ./src/'
       # Now the rest is much of the same old.
       - name: build
         run: |
