@@ -1,5 +1,7 @@
+/*	$OpenBSD: memrchr.c,v 1.4 2019/01/25 00:19:25 millert Exp $	*/
+
 /*
- * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+ * Copyright (c) 2007 Todd C. Miller <millert@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,19 +16,23 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#if !defined(H_OBSD_STRING)
-#define H_OBSD_STRING
+#include <string.h>
 
-#define LIBOBSD_INC_NEXT string.h
-#include <libobsd_inc_next.h>
+/*
+ * Reverse memchr()
+ * Find the last occurrence of 'c' in the buffer 's' of size 'n'.
+ */
+void *
+memrchr(const void *s, int c, size_t n)
+{
+	const unsigned char *cp;
 
-#pragma libobsd explicit_bzero void explicit_bzero(void *, size_t);
-
-#pragma libobsd memrchr void *memrchr(const void *, int, size_t);
-
-#pragma libobsd strlcpy size_t strlcpy(char *, const char *, size_t);
-#pragma libobsd strlcat size_t strlcat(char *, const char *, size_t);
-
-#pragma libobsd strsep char *strsep(char **, const char *);
-
-#endif /* !defined(H_OBSD_STRING) */
+	if (n != 0) {
+		cp = (unsigned char *)s + n;
+		do {
+			if (*(--cp) == (unsigned char)c)
+				return((void *)cp);
+		} while (--n != 0);
+	}
+	return(NULL);
+}

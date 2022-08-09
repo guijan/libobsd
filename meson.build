@@ -36,10 +36,18 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
   deps += cc.find_library('compat')
 elif cc.has_header_symbol('features.h', '__GLIBC__')
-  # Some libcs might set __GLIBC__ in features.h to try to imitate glibc and
-  # improve compatibility with other programs. Make sure we test for glibc last
-  # for this reason.
+  # Some libcs (e.g. uClibc-ng) might set __GLIBC__ in features.h to try to
+  # imitate glibc. Make sure we test for __GLIBC__ last for this reason.
   args += ['-D_DEFAULT_SOURCE']
+elif cc.has_header_symbol('features.h', '_GNU_SOURCE',
+                          prefix: '''#define _ALL_SOURCE
+                          #undef _GNU_SOURCE
+                          ''')
+  # musl doesn't want to be detected, so it doesn't provide its own #define.
+  # However, it appears to have an unique behavior that is easy to detect:
+  # musl's features.h defines _GNU_SOURCE if _ALL_SOURCE is defined. _ALL_SOURCE
+  # appears to be an original musl extension.
+  args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
 endif
 
 # user_args are compiler args that users of this library NEED to use.

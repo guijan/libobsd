@@ -21,6 +21,7 @@ tests = {
   'errc': 'errc.c',
   'errx': 'errx.c',
   'explicit_bzero': 'explicit_bzero.c',
+  'memrchr': 'memrchr.c',
   'freezero': 'freezero.c',
   'getopt': 'getopt.c',
   'getprogname': 'getprogname.c',

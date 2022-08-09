@@ -20,6 +20,7 @@
 #
 string = {
   'explicit_bzero': ['', 'explicit_bzero.3'],
+  'memrchr': ['memrchr.c', 'memrchr.3'],
   'strlcat': ['strlcat.c', 'strlcpy.3'],
   'strlcpy': ['strlcpy.c', 'strlcpy.3'],
   'strsep': ['strsep.c', 'strsep.3'],
