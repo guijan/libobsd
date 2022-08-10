@@ -29,6 +29,10 @@ foo@bar:~/libobsd$ meson setup build
 foo@bar:~/libobsd$ meson compile -C build
 ```
 
+Linux users will need to install linux-headers.
+The oldest supported Linux version is Linux 5.9. Older versions are missing the
+close_range() syscall.
+
 ## Features
 ### Libbsd compatibility mode:
 ```console

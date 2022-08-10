@@ -28,7 +28,7 @@ on: [push, pull_request]
 #      - name: test_system
 #        run: meson test --suite system -C build || true
 #      - uses: actions/upload-artifact@v3.1.0
-#        if: failure()
+#        if: always()
 #        with:
 #          name: meson-logs
 #          path: build/meson-logs
@@ -37,14 +37,14 @@ on: [push, pull_request]
 # requires the least hacks.
 jobs:
   dietlibc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # 20.04 uses kernel 5.8, we need 5.9+
     steps:
       - uses: actions/setup-python@v4.2.0
       - name: setup
         run: |
           pip install meson ninja
           sudo apt update
-          sudo apt install -y dietlibc-dev valgrind
+          sudo apt install -y dietlibc-dev valgrind linux-headers-generic
       - uses: actions/checkout@v3.0.2
       - name: build
         run: |
@@ -56,7 +56,7 @@ jobs:
       - name: test_system
         run: meson test --wrapper valgrind --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-dietlibc
           path: build/meson-logs
@@ -80,13 +80,14 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-emscripten
           path: build/meson-logs
 
   glibc:
-    runs-on: ubuntu-latest
+    # Need Ubuntu >= 22.04 because glibc 2.34 is required for closefrom().
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/setup-python@v4.2.0
       - name: setup
@@ -104,7 +105,7 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-glibc
           path: build/meson-logs
@@ -133,11 +134,11 @@ jobs:
       - name: test_system
         run: vmshell meson test --suite system -C build || true
       - name: copy falure logs
-        if: failure()
+        if: always()
         run: |
           vmshell tar -cf - build/meson-logs | tar -xf -
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-haiku
           path: build/meson-logs
@@ -159,7 +160,7 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-macos
           path: build/meson-logs
@@ -198,7 +199,7 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-${{matrix.sys}}
           path: build/meson-logs
@@ -224,7 +225,7 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-msys2
           path: build/meson-logs
@@ -245,7 +246,7 @@ jobs:
             meson test --no-suite system -C build
             meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-netbsd
           path: build/meson-logs
@@ -269,13 +270,9 @@ jobs:
           if ("${{matrix.arch}}" -eq "aarch64") {
             $arm = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
           }
-          if ("${{matrix.cc}}" -eq "msvc") {
-            # asan doesn't seem to be working with clang, so use it only with
-            # MSVC.
-            $build = "-Dbuildtype=debug"
-            $asan = "-Db_sanitize=address"
-          }
-          meson setup $uwp $arm $build $asan --backend=vs `
+          # Don't do debug builds because that triggers a Windows bug:
+          # https://developercommunity.visualstudio.com/t/_setmaxstdio-hangs-the-program-if-the/10164855?space=62&q=setmaxstdio&viewtype=all
+          meson setup $uwp $arm $build $asan --buildtype=release --backend=vs `
               --cross-file .github/workflows/meson-vs-${{matrix.cc}}.txt `
               -Dtest_system=true build
           meson compile -C build
@@ -284,7 +281,7 @@ jobs:
       - name: test_system
         run: meson test --suite system -C build || true
       - uses: actions/upload-artifact@v3.1.0
-        if: failure()
+        if: always()
         with:
           name: meson-logs-vs-${{matrix.cc}}-${{matrix.api}}-${{matrix.arch}}
           path: build/meson-logs

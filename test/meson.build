@@ -12,10 +12,18 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
+configure_file(output: 'test_config.h', input: 'test_config.h.in',
+  configuration: {
+    'HAVE_HANDLER': cc.has_function('_set_invalid_parameter_handler',
+                                    prefix: '#include <stdlib.h>')
+  }
+)
+
 tests = {
   'arc4random': 'arc4random.c',
   'arc4random_buf': 'arc4random_buf.c',
   'arc4random_uniform': 'arc4random_uniform.c',
+  'closefrom': 'closefrom.c',
   'daemon': 'daemon.c',
   'err': 'err.c',
   'errc': 'errc.c',
@@ -40,11 +48,16 @@ tests = {
 }
 
 foreach testname, src : tests
+  suite = []
   if syms.contains(testname)
-    test(testname, executable(testname, src, dependencies: libobsd_dep),
-         suite: 'libobsd')
+    suite += 'libobsd'
   elif get_option('test_system')
-    test(testname, executable(testname, src, dependencies: libobsd_dep),
-         suite: 'system')
+    suite += 'system'
+  endif
+
+  if suite.length() != 0
+    exe = executable(testname, src, dependencies: libobsd_dep,
+                     include_directories: include_directories('.'))
+    test(testname, exe, suite: suite)
   endif
 endforeach

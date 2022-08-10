@@ -19,6 +19,7 @@
 # [2] = is the function needed? true/false
 #
 unistd = {
+  'closefrom': ['closefrom.c', 'closefrom.3'],
   'getopt': ['getopt.c', 'getopt.3'],
   'pledge': ['pledge.c', 'pledge.3'],
   'unveil': ['unveil.c', 'unveil.3'],
@@ -48,6 +49,101 @@ foreach func, info : unistd
   unistd_man += files(info[1])
   unistd_needed = true
 endforeach
+
+if cc.has_header('io.h')
+  unistd_pragma += 'io.h'
+  unistd_needed = true
+endif
+
+if unistd['closefrom'][2]
+  closefrom_data = configuration_data()
+
+  close_range = cc.has_function('close_range', args: args,
+                                 dependencies: deps,
+                                 prefix: '#include <unistd.h>')
+  # Some libcs don't have a wrapper for the syscall, so we provide our own in
+  # those cases.
+  if not close_range and host_machine.system() == 'linux'
+    cc.has_header('linux/close_range.h')
+    unistd_src += files('closefrom_close_range_syscall.c')
+    closefrom_data.set('CLOSEFROM_CLOSE_RANGE_WRAPPER', true)
+    close_range = true
+  endif
+  if close_range
+    unistd_src += files('closefrom_close_range.c')
+    closefrom_data.set('CLOSEFROM_CLOSE_RANGE', true)
+  else # No fallbacks if we have close_range.
+
+    if import('fs').exists('/dev/fd/0')
+      devfd_hdrs = '''#include <sys/types.h>
+                      #include <dirent.h>
+                      #include <unistd.h>'''
+      # XXX: Might want to check if readdir() is thread-safe. Both readdir() and
+      # readdir_r() are more or less broken APIs as far as the POSIX version
+      # goes, but typical implementations are not.
+      devfd_funcs = true
+      foreach func : ['opendir', 'readdir', 'closedir', 'close']
+        if not cc.has_function(func, args: args, dependencies: deps,
+                               prefix: devfd_hdrs)
+          devfd_funcs = false
+          break
+        endif
+      endforeach
+      if devfd_funcs
+        closefrom_data.set('CLOSEFROM_DEVFD', true)
+        unistd_src += files('closefrom_devfd.c')
+      endif
+    endif
+
+    # We always have at the very least the closefrom() that uses
+    # getdtablesize(), this is probably the worst backend but also the most
+    # portable.
+    closefrom_data.set('CLOSEFROM_GETDTABLESIZE', true)
+    # if close() is in io.h, assume it's Microsoft's close(); Microsoft's
+    # differs from POSIX by invoking an invalid parameter handler on error.
+    if cc.has_function('close', args: args, dependencies: deps,
+                       prefix: '#include <io.h>')
+      unistd_src += files('closefrom_wingetdtablesize.c')
+      if cc.has_function('_set_thread_local_invalid_parameter_handler',
+                         args: args, dependencies: deps,
+                         prefix: '#include <stdlib.h>')
+        closefrom_data.set('CLOSEFROM_THREADED_PARAM_HANDLER', true)
+      endif
+    else
+      unistd_src += files('closefrom_getdtablesize.c')
+    endif
+    if not cc.has_function('getdtablesize', args: args, dependencies: deps,
+                           prefix: '#include <unistd.h>')
+      closefrom_data.set('CLOSEFROM_GETDTABLESIZE_DECL', true)
+
+      maxstdio = true
+      foreach func : ['_setmaxstdio', '_getmaxstdio']
+        if not cc.has_function(func, args: args, dependencies: deps,
+                               prefix: '#include <stdio.h>')
+          maxstdio = false
+          break
+        endif
+      endforeach
+      if maxstdio
+        unistd_src += files('closefrom_getdtablesize__setmaxstdio.c')
+      elif cc.has_function('getrlimit', args: args, dependencies: deps,
+                           prefix: '#include <sys/resource.h>') \
+           and cc.has_header_symbol('sys/resource.h', 'RLIMIT_NOFILE',
+                                    args: args, dependencies: deps)
+        unistd_src += files('closefrom_getdtablesize_getrlimit.c')
+      elif cc.has_function('sysconf', args: args, dependencies: deps,
+                           prefix: '#include unistd.h')
+        unistd_src += files('closefrom_getdtablesize_sysconf.c')
+      else
+        error('no way to implement closefrom()')
+      endif
+    endif
+  endif
+
+  gen_inc += configure_file(input: 'closefrom.h.in',
+                            output: 'closefrom.h',
+                            configuration: closefrom_data)
+endif
 
 getopt_syms_needed = false
 foreach sym : ['optarg', 'opterr', 'optind', 'optopt', 'optreset']

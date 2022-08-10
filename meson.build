@@ -67,7 +67,9 @@ endif
 user_args = args
 
 args += '-DOBSD_EXPORTING'
-if host_machine.system() == 'windows' or host_machine.system() == 'cygwin'
+ms_windows = host_machine.system() == 'windows' \
+             or host_machine.system() == 'cygwin'
+if ms_windows
   user_args += '-DOBSD_IMPORTING'
 endif
 if cc.get_argument_syntax() == 'msvc'

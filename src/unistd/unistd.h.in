@@ -18,10 +18,13 @@
 #define H_OBSD_UNISTD
 
 #include <stddef.h>
+#pragma obsd io.h #include <io.h> /* Windows declares close()/dup2 here. */
 
 #include <obsd_defs.h>
 #pragma obsd unistd.h #define OBSD_INC_NEXT unistd.h
 #pragma obsd unistd.h #include <obsd_inc_next.h>
+
+#pragma obsd closefrom OBSD_PUB int closefrom(int);
 
 /*
  * pledge/unveil can't be ported, but they're also not strictly necessary.

@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+#if !defined(H_CLOSEFROM)
+#define H_CLOSEFROM
+
+enum { extrafd = 1024 };
+
+/* Backends for implementing closefrom(). */
+#mesondefine CLOSEFROM_CLOSE_RANGE
+#mesondefine CLOSEFROM_DEVFD
+#mesondefine CLOSEFROM_GETDTABLESIZE
+
+/* Helper definitions */
+#mesondefine CLOSEFROM_CLOSE_RANGE_WRAPPER
+#mesondefine CLOSEFROM_GETDTABLESIZE_DECL
+#mesondefine CLOSEFROM_THREADED_PARAM_HANDLER
+
+#if defined(CLOSEFROM_CLOSE_RANGE)
+int closefrom_close_range(int);
+#  if defined(CLOSEFROM_CLOSE_RANGE_WRAPPER)
+/* If we have close_range but need to provide our own wrapper for the syscall.
+ * Only glibc has a wrapper as of right now.
+ */
+int close_range(unsigned int, unsigned int, int);
+#  endif
+#endif
+
+#if defined(CLOSEFROM_DEVFD)
+int closefrom_devfd(int);
+#endif
+
+#if defined(CLOSEFROM_GETDTABLESIZE)
+int closefrom_getdtablesize(int);
+#  if defined(CLOSEFROM_GETDTABLESIZE_DECL)
+/* We'll implement getdtablesize() ourselves. */
+int getdtablesize(void);
+#  endif
+#endif
+
+#endif /* !defined(H_CLOSEFROM) */

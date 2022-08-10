@@ -42,7 +42,7 @@ task:
     kvm: true
   name: musl
   setup_script:
-    - apk add meson alpine-sdk clang
+    - apk add meson alpine-sdk clang linux-headers
   << : *common_script
 
 task:
@@ -58,7 +58,7 @@ task:
     - pacman-key --recv-keys 6E06FBC8
     - pacman-key --lsign-key 6E06FBC8
   setup_script:
-    - pacman --noconfirm -Syu compcert ninja meson git
+    - pacman --noconfirm -Syu compcert ninja meson git linux-headers
   << : *common_script
 
 task:
