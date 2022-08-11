@@ -16,10 +16,10 @@
 
 #include <unistd.h>
 
-#include <libobsd_defines.h>
+#include <obsd_defs.h>
 
-#pragma libobsd optarg PUBLIC char *optarg = NULL;
-#pragma libobsd opterr PUBLIC int opterr = 1;
-#pragma libobsd optind PUBLIC int optind = 1;
-#pragma libobsd optopt PUBLIC int optopt = '?';
-#pragma libobsd optreset PUBLIC int optreset = 0;
+#pragma obsd optarg char *optarg = NULL;
+#pragma obsd opterr int opterr = 1;
+#pragma obsd optind int optind = 1;
+#pragma obsd optopt int optopt = '?';
+#pragma obsd optreset int optreset = 0;

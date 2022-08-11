@@ -15,6 +15,7 @@
  */
 
 #include <errno.h>
+#include <stdlib.h>
 
 /* getprogname() on top of program_invocation_short_name from GNU. Also
  * implemented in dietlibc, musl, and likely others.

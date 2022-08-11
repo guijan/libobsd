@@ -15,6 +15,7 @@
  */
 
 #include <windows.h>
+#include <string.h>
 
 void
 explicit_bzero(void *b, size_t len)

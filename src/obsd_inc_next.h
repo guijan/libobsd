@@ -24,13 +24,13 @@
  *
  * You should see including this header as a function call of sorts. You
  * pass arguments to this function by defining a variable just before calling
- * it, that variable is LIBOBSD_INC_NEXT. You can #define LIBOBSD_INC_NEXT again
+ * it, that variable is OBSD_INC_NEXT. You can #define OBSD_INC_NEXT again
  * afterwards.
  *
  * Here's how to use it:
  *
- * #define LIBOBSD_INC_NEXT stdio.h
- * #include <libobsd_inc_next.h>
+ * #define OBSD_INC_NEXT stdio.h
+ * #include <obsd_inc_next.h>
  *
  * Note the lack of <> or "" around the header stdio.h. The sequence of 2
  * preprocessor macros above is equivalent to the following GCC extension:
@@ -40,16 +40,16 @@
 
 #if defined(_MSC_VER) && !defined(__clang__)
 	#if _MSC_VER >= 1900
-		#define LIBOBSD_INC(x) <../ucrt/x>
+		#define OBSD_INC(x) <../ucrt/x>
 	#else
-		#define LIBOBSD_INC(x) <../include/x>
+		#define OBSD_INC(x) <../include/x>
 	#endif
 
-	#include LIBOBSD_INC(LIBOBSD_INC_NEXT)
+	#include OBSD_INC(OBSD_INC_NEXT)
 #else
-	#define LIBOBSD_INC(x) <x>
-	#include_next LIBOBSD_INC(LIBOBSD_INC_NEXT)
+	#define OBSD_INC(x) <x>
+	#include_next OBSD_INC(OBSD_INC_NEXT)
 #endif
 
-#undef LIBOBSD_INC
-#undef LIBOBSD_INC_NEXT
+#undef OBSD_INC
+#undef OBSD_INC_NEXT

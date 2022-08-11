@@ -9,4 +9,6 @@ Changes in libobsd master:
 - Add NetBSD support
 - Simplify reallocarray, recallocarray, reducing source/machine code size
 - Add memrchr()
+- Change the strategy used for symbol visibility to a simpler and better one
+- Improve compatibility with numerous libcs
 

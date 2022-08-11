@@ -27,7 +27,7 @@ main(int argc, char *argv[])
 {
 	char buf[16384];
 
-#if defined(LIBOBSD_SETPROCTITLE_INIT)
+#if defined(SETPROCTITLE_INIT)
 	extern char **environ;
 
 	/*
@@ -67,7 +67,7 @@ main(int argc, char *argv[])
 		argv++;
 	}
 
-#if defined(LIBOBSD_SETPROCTITLE_INIT)
+#if defined(SETPROCTITLE_INIT)
 	/* Did I break environ somehow? */
 	while (*environ != NULL) {
 		strlcpy(buf, *environ, sizeof(buf));

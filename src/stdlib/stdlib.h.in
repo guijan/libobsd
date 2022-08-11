@@ -17,29 +17,31 @@
 #if !defined(H_OBSD_STDLIB)
 #define H_OBSD_STDLIB
 
-#define LIBOBSD_INC_NEXT stdlib.h
-#include <libobsd_inc_next.h>
+#pragma obsd stdlib_uint32 #include <stdint.h>
 
-#pragma libobsd stdlib_uint32 #include <stdint.h>
+#include <obsd_defs.h>
+#define OBSD_INC_NEXT stdlib.h
+#include <obsd_inc_next.h>
 
-#pragma libobsd arc4random uint32_t arc4random(void);
-#pragma libobsd arc4random_buf void arc4random_buf(void *, size_t);
-#pragma libobsd arc4random_uniform uint32_t arc4random_uniform(uint32_t);
+#pragma obsd arc4random OBSD_PUB uint32_t arc4random(void);
+#pragma obsd arc4random_buf OBSD_PUB void arc4random_buf(void *, size_t);
+#pragma obsd arc4random_uniform OBSD_PUB uint32_t arc4random_uniform(uint32_t);
 
-#pragma libobsd daemon int daemon(int, int);
+#pragma obsd daemon OBSD_PUB int daemon(int, int);
 
-#pragma libobsd getprogname const char *getprogname(void);
+#pragma obsd getprogname OBSD_PUB const char *getprogname(void);
 
-#pragma libobsd freezero void freezero(void *, size_t);
-#pragma libobsd reallocarray void *reallocarray(void *, size_t, size_t);
-#pragma libobsd recallocarray void *recallocarray(void *, size_t, size_t,
-#pragma libobsd recallocarray                     size_t);
+#pragma obsd freezero OBSD_PUB void freezero(void *, size_t);
+#pragma obsd reallocarray OBSD_PUB void *reallocarray(void *, size_t, size_t);
+#pragma obsd recallocarray OBSD_PUB void *recallocarray(void *, size_t, size_t,
+#pragma obsd recallocarray     size_t);
 
-#pragma libobsd setproctitle_init #define LIBOBSD_SETPROCTITLE_INIT
-#pragma libobsd setproctitle_init void setproctitle_init(int, char **, char **);
-#pragma libobsd setproctitle void setproctitle(const char *, ...);
+#pragma obsd setproctitle_init #define SETPROCTITLE_INIT
+#pragma obsd setproctitle_init OBSD_PUB void setproctitle_init(int, char **,
+#pragma obsd setproctitle_init     char **);
+#pragma obsd setproctitle OBSD_PUB void setproctitle(const char *, ...);
 
-#pragma libobsd strtonum long long strtonum(const char *, long long, long long,
-#pragma libobsd strtonum                    const char **);
+#pragma obsd strtonum OBSD_PUB long long strtonum(const char *, long long,
+#pragma obsd strtonum     long long, const char **);
 
 #endif /* !defined(H_OBSD_STDLIB) */

@@ -26,11 +26,11 @@ static int compar_str(const void *, const void *);
 
 /* header_generator.c: generate header from tiny C-compatible DSL
  *
- * The DSL is very simple: If the line starts with '#pragma libobsd ' (including
- * the space), we parse it. If the word after '#pragma libobsd ' is among the
+ * The DSL is very simple: If the line starts with '#pragma obsd ' (including
+ * the space), we parse it. If the word after '#pragma obsd ' is among the
  * words we were passed in argv, we print the part of the line after the word.
 
- * If the line doesn't start with '#pragma libobsd ', we print it.
+ * If the line doesn't start with '#pragma obsd ', we print it.
  *
  * We also silently refuse to print more than 1 blank line in sequence.
  */
@@ -42,7 +42,7 @@ main(int argc, char *argv[])
 	 */
 	char line[80+2+1];
 	char *p;
-	const char pref[] = "#pragma libobsd ";
+	const char pref[] = "#pragma obsd ";
 	size_t preflen = sizeof(pref)-1;
 	int wasblank;
 

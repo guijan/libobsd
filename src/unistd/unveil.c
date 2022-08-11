@@ -14,8 +14,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <unistd.h>
+
 int
-unveil(const char *unused1, const char *unused2)
+(unveil)(const char *unused1, const char *unused2)
 {
 	(void)unused1;
 	(void)unused2;

@@ -17,7 +17,7 @@
 #include <windows.h>
 #include <bcrypt.h>
 
-#include <stddef.h>
+#include <string.h>
 
 void
 arc4random_buf(void *_buf, size_t nbytes)

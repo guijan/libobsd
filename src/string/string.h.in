@@ -17,16 +17,17 @@
 #if !defined(H_OBSD_STRING)
 #define H_OBSD_STRING
 
-#define LIBOBSD_INC_NEXT string.h
-#include <libobsd_inc_next.h>
+#include <obsd_defs.h>
+#define OBSD_INC_NEXT string.h
+#include <obsd_inc_next.h>
 
-#pragma libobsd explicit_bzero void explicit_bzero(void *, size_t);
+#pragma obsd explicit_bzero OBSD_PUB void explicit_bzero(void *, size_t);
 
-#pragma libobsd memrchr void *memrchr(const void *, int, size_t);
+#pragma obsd memrchr OBSD_PUB void *memrchr(const void *, int, size_t);
 
-#pragma libobsd strlcpy size_t strlcpy(char *, const char *, size_t);
-#pragma libobsd strlcat size_t strlcat(char *, const char *, size_t);
+#pragma obsd strlcpy OBSD_PUB size_t strlcpy(char *, const char *, size_t);
+#pragma obsd strlcat OBSD_PUB size_t strlcat(char *, const char *, size_t);
 
-#pragma libobsd strsep char *strsep(char **, const char *);
+#pragma obsd strsep OBSD_PUB char *strsep(char **, const char *);
 
 #endif /* !defined(H_OBSD_STRING) */

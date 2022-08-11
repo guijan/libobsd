@@ -14,17 +14,28 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
+/* This header is internal to libobsd, do not use it in your program. */
 
-/* def_generator.c: print all of argv[] as a Microsoft .def file.
- * https://docs.microsoft.com/en-us/cpp/build/reference/module-definition-dot-def-files?view=msvc-170
- */
-int
-main(int argc, char *argv[])
-{
-	int i;
+#if !defined(H_OBSD_DEFS)
+#define H_OBSD_DEFS
 
-	puts("EXPORTS");
-	for (i = 1; i < argc; i++)
-		printf("   %s\n", argv[i]);
-}
+#if defined(OBSD_EXPORTING)
+	#if defined(_MSC_VER)
+		/*
+	 	 * __declspec is necessary for variables on MSVC. The compiler
+		 * also supports passing a .def file with a list of symbols to
+		 * export, but I've found that Windows requires exported
+		 * variables to be alinged ot 8 bytes and the .def file doesn't
+		 * guarantee it.
+	 	 */
+		#define OBSD_PUB __declspec(dllexport)
+	#else
+		#define OBSD_PUB __attribute__ ((visibility ("default")))
+	#endif
+#elif defined(OBSD_IMPORTING)
+	#define OBSD_PUB __declspec(dllimport)
+#else
+	#define OBSD_PUB
+#endif
+
+#endif /* !defined(OBSD_DEFS) */

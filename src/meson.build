@@ -20,9 +20,8 @@ subdir('stdlib')
 subdir('string')
 subdir('unistd')
 
-# queue.h is a special case; it only provides a header. It also must not be
-# added to `inc` because it needs to be installed to a subdir, it's handled
-# separately.
+# queue.h is a special case; it only provides a header and handles its own
+# installation.
 subdir('queue')
 
 syms += err_sym + stdlib_sym + string_sym + unistd_sym
@@ -31,15 +30,6 @@ src += err_src + stdlib_src + string_src + unistd_src
 man += err_man + stdlib_man + string_man + queue_man + unistd_man
 
 incdir += include_directories('.')
-gen_inc += files('libobsd_inc_next.h')
-gen_inc += files('libobsd_defines.h')
 if inst_h
-  install_headers('libobsd_inc_next.h', 'libobsd_defines.h', subdir: 'obsd')
+  install_headers('obsd_inc_next.h', 'obsd_defs.h', subdir: 'obsd')
 endif
-
-def_generator = executable('def_generator', 'def_generator.c', native: true,
-                           c_args: args)
-def = custom_target('def_generator',
-                    command: [def_generator] + syms,
-                    capture: true,
-                    output: 'libobsd.def')

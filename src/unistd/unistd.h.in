@@ -17,11 +17,11 @@
 #if !defined(H_OBSD_UNISTD)
 #define H_OBSD_UNISTD
 
-#pragma libobsd unistd.h #define LIBOBSD_INC_NEXT unistd.h
-#pragma libobsd unistd.h #include <libobsd_inc_next.h>
-#pragma libobsd getopt_syms #include <libobsd_defines.h>
-
 #include <stddef.h>
+
+#include <obsd_defs.h>
+#pragma obsd unistd.h #define OBSD_INC_NEXT unistd.h
+#pragma obsd unistd.h #include <obsd_inc_next.h>
 
 /*
  * pledge/unveil can't be ported, but they're also not strictly necessary.
@@ -29,16 +29,16 @@
  * away entirely, but the functions are in the library in case the programmer
  * does something weird.
  */
-#pragma libobsd pledge #define pledge(unused1, unused2) ((int)0)
-#pragma libobsd pledge int (pledge)(const char *, const char *);
-#pragma libobsd unveil #define unveil(unused1, unused2) ((int)0)
-#pragma libobsd unveil int (unveil)(const char *, const char *);
+#pragma obsd pledge #define pledge(unused1, unused2) ((int)0)
+#pragma obsd pledge OBSD_PUB int (pledge)(const char *, const char *);
+#pragma obsd unveil #define unveil(unused1, unused2) ((int)0)
+#pragma obsd unveil OBSD_PUB int (unveil)(const char *, const char *);
 
-#pragma libobsd getopt int getopt(int, char * const *, const char *);
-#pragma libobsd optarg extern PUBLIC char *optarg;
-#pragma libobsd opterr extern PUBLIC int opterr;
-#pragma libobsd optind extern PUBLIC int optind;
-#pragma libobsd optopt extern PUBLIC int optopt;
-#pragma libobsd optreset extern PUBLIC int optreset;
+#pragma obsd getopt OBSD_PUB int getopt(int, char * const *, const char *);
+#pragma obsd optarg OBSD_PUB extern char *optarg;
+#pragma obsd opterr OBSD_PUB extern int opterr;
+#pragma obsd optind OBSD_PUB extern int optind;
+#pragma obsd optopt OBSD_PUB extern int optopt;
+#pragma obsd optreset OBSD_PUB extern int optreset;
 
 #endif /* !defined(H_OBSD_UNISTD) */

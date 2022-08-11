@@ -18,6 +18,7 @@
 #include <io.h>
 #include <fcntl.h>
 
+#include <direct.h>
 #include <errno.h>
 #include <stdlib.h>
 

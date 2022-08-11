@@ -21,7 +21,7 @@
 #include <stdio.h>
 
 static void arc4random_buf_except(void *, size_t, unsigned char);
-static void arc4random_buf_with(void *, size_t, unsigned char);
+static void arc4random_buf_with(void *, uint32_t, unsigned char);
 
 int
 main(void)
@@ -97,7 +97,7 @@ arc4random_buf_except(void *_buf, size_t len, unsigned char except)
  * exactly one instance of the byte with in the buffer.
  */
 static void
-arc4random_buf_with(void *_buf, size_t len, unsigned char with)
+arc4random_buf_with(void *_buf, uint32_t len, unsigned char with)
 {
 	unsigned char *buf = _buf;
 	arc4random_buf_except(buf, len, with);

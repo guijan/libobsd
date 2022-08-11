@@ -17,22 +17,23 @@
 #if !defined(H_OBSD_ERR)
 #define H_OBSD_ERR
 
-#pragma libobsd err.h #define LIBOBSD_INC_NEXT err.h
-#pragma libobsd err.h #include <libobsd_inc_next.h>
+#pragma obsd verr_func #include <stdarg.h>
 
-#pragma libobsd verr_func #include <stdarg.h>
+#include <obsd_defs.h>
+#pragma obsd err.h #define OBSD_INC_NEXT err.h
+#pragma obsd err.h #include <obsd_inc_next.h>
 
-#pragma libobsd err void err(int, const char *, ...);
-#pragma libobsd errc void errc(int, int, const char *, ...);
-#pragma libobsd errx void errx(int, const char *, ...);
-#pragma libobsd verr void verr(int, const char *, va_list);
-#pragma libobsd verrc void verrc(int, int, const char *, va_list);
-#pragma libobsd verrx void verrx(int eval, const char *, va_list);
-#pragma libobsd vwarn void vwarn(const char *, va_list);
-#pragma libobsd vwarnc void vwarnc(int, const char *, va_list);
-#pragma libobsd vwarnx void vwarnx(const char *fmt, va_list);
-#pragma libobsd warn void warn(const char *, ...);
-#pragma libobsd warnc void warnc(int, const char *, ...);
-#pragma libobsd warnx void warnx(const char *, ...);
+#pragma obsd err OBSD_PUB void err(int, const char *, ...);
+#pragma obsd errc OBSD_PUB void errc(int, int, const char *, ...);
+#pragma obsd errx OBSD_PUB void errx(int, const char *, ...);
+#pragma obsd verr OBSD_PUB void verr(int, const char *, va_list);
+#pragma obsd verrc OBSD_PUB void verrc(int, int, const char *, va_list);
+#pragma obsd verrx OBSD_PUB void verrx(int eval, const char *, va_list);
+#pragma obsd vwarn OBSD_PUB void vwarn(const char *, va_list);
+#pragma obsd vwarnc OBSD_PUB void vwarnc(int, const char *, va_list);
+#pragma obsd vwarnx OBSD_PUB void vwarnx(const char *fmt, va_list);
+#pragma obsd warn OBSD_PUB void warn(const char *, ...);
+#pragma obsd warnc OBSD_PUB void warnc(int, const char *, ...);
+#pragma obsd warnx OBSD_PUB void warnx(const char *, ...);
 
 #endif /* !defined(H_OBSD_ERR) */

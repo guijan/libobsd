@@ -14,8 +14,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <unistd.h>
+
 int
-pledge(const char *unused1, const char *unused2)
+(pledge)(const char *unused1, const char *unused2)
 {
 	(void)unused1;
 	(void)unused2;

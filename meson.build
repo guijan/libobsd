@@ -27,18 +27,25 @@ cc = meson.get_compiler('c')
 
 # Some systems implement some OpenBSD functions, but need to link in a library
 # or set a macro to expose them.
+#
+# Be very careful here and be aware that what one libc does is very different
+# from another even when macro names match.
 if host_machine.system() == 'haiku'
+  args += ['-D_GNU_SOURCE']
   deps += cc.find_library('bsd')
-  args += ['-D_BSD_SOURCE']
 elif host_machine.system() == 'netbsd'
   args += ['-D_OPENBSD_SOURCE']
 elif cc.has_header_symbol('features.h', '__dietlibc__')
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
   deps += cc.find_library('compat')
-elif cc.has_header_symbol('features.h', '__GLIBC__')
+elif cc.has_header_symbol('features.h', '__NEWLIB__') \
+     or cc.has_header_symbol('features.h', '__BIONIC__') \
+     or cc.has_header_symbol('features.h', '__GLIBC__')
   # Some libcs (e.g. uClibc-ng) might set __GLIBC__ in features.h to try to
-  # imitate glibc. Make sure we test for __GLIBC__ last for this reason.
-  args += ['-D_DEFAULT_SOURCE']
+  # imitate glibc. Make sure we test for __GLIBC__ last for this reason. If the
+  # library exposes everything when _GNU_SOURCE is set, then it really does
+  # behave like glibc, so put it here if it doesn't require anything else.
+  args += ['-D_GNU_SOURCE']
 elif cc.has_header_symbol('features.h', '_GNU_SOURCE',
                           prefix: '''#define _ALL_SOURCE
                           #undef _GNU_SOURCE
@@ -50,13 +57,22 @@ elif cc.has_header_symbol('features.h', '_GNU_SOURCE',
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
 endif
 
+if cc.get_argument_syntax() == 'msvc'
+  # This library and its users shouldn't be warned for using standard POSIX
+  # names. That would warn over OpenBSD behavior.
+  args += '-D_CRT_NONSTDC_NO_WARNINGS'
+endif
+
 # user_args are compiler args that users of this library NEED to use.
 user_args = args
 
+args += '-DOBSD_EXPORTING'
+if host_machine.system() == 'windows' or host_machine.system() == 'cygwin'
+  user_args += '-DOBSD_IMPORTING'
+endif
 if cc.get_argument_syntax() == 'msvc'
   args += '-D_CRT_SECURE_NO_WARNINGS'
 endif
-
 # Spectre mitigations are off by default under MSVC for some ungodly reason.
 if cc.get_id() == 'msvc'
   args += '/Qspectre'
@@ -66,15 +82,15 @@ inst_h = not meson.is_subproject()
 h_inst_dir = get_option('includedir') / 'obsd'
 # We do have global args, but I've chosen to pass them manually where they're
 # needed, so add_global_arguments isn't used.
-add_project_arguments(args, language: 'c')
 subdir('src')
 
 if meson.is_subproject()
   libobsd = static_library('obsd', src + gen_inc,
+                           c_args: args,
                            install: false,
                            include_directories: incdir,
                            dependencies: deps,
-                           c_args: '-DLIBOBSD_EXPORTING')
+                           gnu_symbol_visibility: 'hidden')
   if host_machine.system() == 'windows' or host_machine.system() == 'cygwin'
     custom_target('license',
                   command: ['unix2dos'],
@@ -90,12 +106,12 @@ if meson.is_subproject()
   endif
 else
   libobsd = library('obsd', src + gen_inc,
+                    c_args: args,
                     install: true,
                     include_directories: incdir,
                     dependencies: deps,
-                    vs_module_defs: def,
-                    version: meson.project_version(),
-                    c_args: '-DLIBOBSD_EXPORTING')
+                    gnu_symbol_visibility: 'hidden')
+
   install_man(man)
   pkg = import('pkgconfig')
   pkg.generate(libobsd,

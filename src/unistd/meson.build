@@ -54,18 +54,7 @@ foreach sym : ['optarg', 'opterr', 'optind', 'optopt', 'optreset']
   if not cc.has_header_symbol('unistd.h', sym, args: args, dependencies: deps)
     getopt_syms_needed = true
     unistd_needed = true
-
     unistd_pragma += sym
-
-    # XXX: This is a kludge. MSVC-style compilers warn if a variable is exported
-    # in a .def file and with declspec simultaneously. Adding sym to unistd_sym
-    # leads to it being put in the .def file later on, so we avoid this. All the
-    # possible sym values will be exported with declspec.
-    # Additionally, exporting variables like the contents of sym can't be done
-    # through the .def file anyway.
-    if cc.get_argument_syntax() != 'msvc'
-      unistd_sym += sym
-    endif
   endif
 endforeach
 
@@ -74,9 +63,6 @@ if unistd_needed
     unistd_pragma += 'unistd.h'
   endif
 
-  if getopt_syms_needed
-    unistd_pragma += 'getopt_syms'
-  endif
   unistd_gen = custom_target('generate_unistd.h',
                              input: 'unistd.h.in',
                              feed: true,

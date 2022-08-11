@@ -17,6 +17,5 @@ option('provide_libbsd', type: 'boolean', value: false,
 
 # This option is for development, not end users.
 option('test_system', type: 'boolean', value: false,
-       description: 'Creates a Meson test suite named \'system\' which'
-                    + ' contains the tests for functions that the current'
-                    + ' implements.')
+       description: 'Creates a Meson test suite named \'system\' which contains'
+                    + ' tests for functions present in the current system.')
