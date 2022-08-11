@@ -19,7 +19,9 @@
 # [2] = is the function needed? true/false
 #
 stdlib = {
+  'arc4random': ['arc4random.c', 'arc4random.3'],
   'arc4random_buf': ['', 'arc4random.3'],
+  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
   'daemon': ['', 'daemon.3'],
   'freezero': ['freezero.c', 'freezero.3'],
   'getprogname': ['', 'getprogname.3'],
@@ -28,14 +30,6 @@ stdlib = {
   'setproctitle': ['', 'setproctitle.3'],
   'strtonum': ['strtonum.c', 'strtonum.3'],
 }
-
-# These are the functions that need the uint32_t type.
-stdlib_uint32 = {
-  'arc4random': ['arc4random.c', 'arc4random.3'],
-  'arc4random_uniform': ['arc4random_uniform.c', 'arc4random.3'],
-}
-
-stdlib += stdlib_uint32
 
 # set [2] in each array of stdlib
 foreach func, info : stdlib
@@ -152,15 +146,17 @@ stdlib_man = []
 stdlib_incdir = []
 stdlib_pragma = []
 
+if not cc.has_type('uint32_t', prefix: '#include <stdlib.h>')
+  stdlib_pragma += ['uint32_t']
+  stdlib_needed = true
+endif
+
 foreach func, info : stdlib
   if not info[2]
     continue
   endif
   if info[0] == ''
    error('no way to implement', func)
-  endif
-  if func in stdlib_uint32
-    stdlib_pragma = ['stdlib_uint32']
   endif
   stdlib_sym += func # build up a database of symbols in the library
   stdlib_src += files(info[0])

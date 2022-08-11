@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2008, 2010, 2011, 2016 Otto Moerbeek <otto@drijf.net>
  * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
@@ -18,9 +19,10 @@
 #include <string.h>
 
 void
-freezero(void *ptr, size_t size)
+freezero(void *ptr, size_t sz)
 {
-	if (size > 0)
-		explicit_bzero(ptr, size);
+	if (ptr == NULL)
+		return;
+	explicit_bzero(ptr, sz);
 	free(ptr);
 }

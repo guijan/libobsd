@@ -11,4 +11,7 @@ Changes in libobsd master:
 - Add memrchr()
 - Change the strategy used for symbol visibility to a simpler and better one
 - Improve compatibility with numerous libcs
+- Fix some functions which weren't including the headers they should
+- Fix wrong handling of a NULL pointer in freezero()
+- Provide uint32_t in stdlib.h on systems that don't
 

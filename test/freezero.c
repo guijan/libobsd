@@ -29,6 +29,7 @@ main(void)
 	for (i = 0; i < sizeof(allocsz) / sizeof(*allocsz); i++) {
 		if ((p = malloc(allocsz[i] == 0 ? 1 : allocsz[i])) == NULL)
 			err(1, "(p = malloc(%d)) == NULL", allocsz[i]);
+		freezero(NULL, allocsz[i]);
 		freezero(p, allocsz[i]);
 	}
 	return (0);

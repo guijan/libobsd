@@ -17,7 +17,6 @@
 #include <sys/random.h>
 
 #include <errno.h>
-#include <inttypes.h>
 #include <stdlib.h>
 
 /* arc4random_buf() on top of getrandom() from Linux. */

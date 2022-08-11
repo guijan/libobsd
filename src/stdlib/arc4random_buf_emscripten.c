@@ -14,9 +14,9 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stddef.h>
-
 #include <emscripten.h>
+
+#include <stdlib.h>
 
 /* References:
  * https://livebook.manning.com/book/webassembly-in-action/c-emscripten-macros/v-7/54
