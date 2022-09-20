@@ -71,10 +71,10 @@ foreach macro : queue_macros
     # There's nothing to gain by slicing and dicing the header, just install the
     # whole thing if a single macro is missing.
     if inst_h
-      install_headers('queue.h', '_null.h', subdir: 'obsd' / 'sys')
+      install_headers('sys/queue.h', 'sys/_null.h', subdir: 'obsd' / 'sys')
     endif
     queue_man += files('queue.3')
-    include_directories('.')
+    incdir += include_directories('.')
     break
   endif
 endforeach

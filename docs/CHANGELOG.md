@@ -14,4 +14,5 @@ Changes in libobsd master:
 - Fix some functions which weren't including the headers they should
 - Fix wrong handling of a NULL pointer in freezero()
 - Provide uint32_t in stdlib.h on systems that don't
+- Fix sys/queue.h not being available to Meson subprojects
 
