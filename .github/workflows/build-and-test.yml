@@ -27,7 +27,7 @@ on: [push, pull_request]
 #        run: meson test --no-suite system -C build
 #      - name: test_system
 #        run: meson test --suite system -C build || true
-#      - uses: actions/upload-artifact@v2.3.1
+#      - uses: actions/upload-artifact@v3.1.0
 #        if: failure()
 #        with:
 #          name: meson-logs
@@ -39,7 +39,7 @@ jobs:
   dietlibc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v3.1.2
+      - uses: actions/setup-python@v4.2.0
       - name: setup
         run: |
           pip install meson ninja
@@ -55,7 +55,7 @@ jobs:
         run: meson test --wrapper valgrind --no-suite system -C build
       - name: test_system
         run: meson test --wrapper valgrind --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-dietlibc
@@ -64,7 +64,7 @@ jobs:
   emscripten:
     runs-on: macos-latest
     steps:
-      - uses: actions/setup-python@v3.1.2
+      - uses: actions/setup-python@v4.2.0
       - name: setup
         run: |
           brew update
@@ -79,7 +79,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-emscripten
@@ -88,7 +88,7 @@ jobs:
   glibc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v3.1.2
+      - uses: actions/setup-python@v4.2.0
       - name: setup
         run: |
           pip install meson ninja
@@ -103,7 +103,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-glibc
@@ -136,7 +136,7 @@ jobs:
         if: failure()
         run: |
           vmshell tar -cf - build/meson-logs | tar -xf -
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-haiku
@@ -145,7 +145,7 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/setup-python@v3.1.2
+      - uses: actions/setup-python@v4.2.0
       - run: |
           brew update
           brew install meson samurai
@@ -158,7 +158,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-macos
@@ -197,7 +197,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-${{matrix.sys}}
@@ -223,7 +223,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-msys2
@@ -244,7 +244,7 @@ jobs:
             meson compile -C build
             meson test --no-suite system -C build
             meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-netbsd
@@ -258,7 +258,7 @@ jobs:
         api: [win32, uwp]
         arch: [aarch64, amd64]
     steps:
-      - uses: actions/setup-python@v3.1.2
+      - uses: actions/setup-python@v4.2.0
       - run: pip install meson
       - uses: actions/checkout@v3.0.2
       - name: build
@@ -283,7 +283,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v2.3.1
+      - uses: actions/upload-artifact@v3.1.0
         if: failure()
         with:
           name: meson-logs-vs-${{matrix.cc}}-${{matrix.api}}-${{matrix.arch}}
