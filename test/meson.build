@@ -61,3 +61,11 @@ foreach testname, src : tests
     test(testname, exe, suite: suite)
   endif
 endforeach
+
+if cc.get_id() == 'ccomp'
+  cxx_support = false
+endif
+if cxx_support
+  test('cxx', executable('cxx', 'cxx.cxx', dependencies: libobsd_dep),
+       suite: 'libobsd')
+endif

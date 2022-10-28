@@ -38,4 +38,12 @@
 	#define OBSD_PUB
 #endif
 
-#endif /* !defined(OBSD_DEFS) */
+#if defined(__cplusplus)
+	#define	OBSD_BEGIN_EXTERN_C	extern "C" {
+	#define	OBSD_END_EXTERN_C	}
+#else
+	#define OBSD_BEGIN_EXTERN_C
+	#define	OBSD_END_EXTERN_C
+#endif
+
+#endif /* !defined(H_OBSD_DEFS) */

@@ -21,6 +21,7 @@
 #define OBSD_INC_NEXT string.h
 #include <obsd_inc_next.h>
 
+OBSD_BEGIN_EXTERN_C
 #pragma obsd explicit_bzero OBSD_PUB void explicit_bzero(void *, size_t);
 
 #pragma obsd memrchr OBSD_PUB void *memrchr(const void *, int, size_t);
@@ -29,5 +30,6 @@
 #pragma obsd strlcat OBSD_PUB size_t strlcat(char *, const char *, size_t);
 
 #pragma obsd strsep OBSD_PUB char *strsep(char **, const char *);
+OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_STRING) */

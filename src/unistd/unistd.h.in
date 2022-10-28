@@ -24,6 +24,7 @@
 #pragma obsd unistd.h #define OBSD_INC_NEXT unistd.h
 #pragma obsd unistd.h #include <obsd_inc_next.h>
 
+OBSD_BEGIN_EXTERN_C
 #pragma obsd closefrom OBSD_PUB int closefrom(int);
 
 /*
@@ -43,5 +44,6 @@
 #pragma obsd optind OBSD_PUB extern int optind;
 #pragma obsd optopt OBSD_PUB extern int optopt;
 #pragma obsd optreset OBSD_PUB extern int optreset;
+OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_UNISTD) */

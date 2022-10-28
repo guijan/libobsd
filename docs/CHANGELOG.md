@@ -17,4 +17,5 @@ Changes in libobsd master:
 - Fix sys/queue.h not being available to Meson subprojects
 - Add closefrom()
 - Include io.h in unistd.h on Windows to expose io.h's POSIX functions
+- Add C++ support
 

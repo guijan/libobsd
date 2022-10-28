@@ -68,31 +68,30 @@ if stdlib['arc4random_buf'][2]
   endforeach
 endif
 
+stdlib_pragma = [] # daemon() needs stdlib_pragma early
 if stdlib['daemon'][2]
   daemon_functions = ['fork', '_exit', 'setsid', 'chdir', 'open', 'dup2']
-  # openbsd  has daemon() declared in stdlib.h
-  # glibc    has daemon() declared in unistd.h
-  # dietlibc has daemon() declared in daemon.h
+  # openbsd has daemon() declared in stdlib.h
+  # glibc and dietlibc have daemon() declared in unistd.h
   if cc.has_function('daemon', args: args, prefix: '#include <unistd.h>',
-                     dependencies: deps) or \
-     cc.has_function('daemon', args: args, prefix: '#include <daemon.h>',
                      dependencies: deps)
-    stdlib += {'daemon': ['daemon_null.c', 'daemon.3', true]}
-  endif
-
-  has_daemon_funcs = true
-  foreach func : daemon_functions
-    if not cc.has_function(func, args: args, dependencies: deps,
-                           prefix: '''#include <unistd.h>
-                                      #include <fcntl.h>''')
-      has_daemon_funcs = false
+    stdlib += {'daemon': ['', '', false]}
+    stdlib_pragma += 'unistd_h'
+  else
+    has_daemon_funcs = true
+    foreach func : daemon_functions
+      if not cc.has_function(func, args: args, dependencies: deps,
+                             prefix: '''#include <unistd.h>
+                                        #include <fcntl.h>''')
+        has_daemon_funcs = false
+      endif
+    endforeach
+    if has_daemon_funcs
+      stdlib += {'daemon': ['daemon.c', 'daemon.3', true]}
+    elif cc.has_function('FreeConsole', args: args, dependencies: deps,
+                         prefix: '#include <windows.h>')
+      stdlib += {'daemon': ['daemon_win.c', 'daemon.3', true]}
     endif
-  endforeach
-  if has_daemon_funcs
-    stdlib += {'daemon': ['daemon.c', 'daemon.3', true]}
-  elif cc.has_function('FreeConsole', args: args, dependencies: deps,
-                       prefix: '#include <windows.h>')
-    stdlib += {'daemon': ['daemon_win.c', 'daemon.3', true]}
   endif
 endif
 
@@ -144,7 +143,6 @@ stdlib_needed = false
 stdlib_src = []
 stdlib_man = []
 stdlib_incdir = []
-stdlib_pragma = []
 
 if not cc.has_type('uint32_t', prefix: '#include <stdlib.h>')
   stdlib_pragma += ['uint32_t']

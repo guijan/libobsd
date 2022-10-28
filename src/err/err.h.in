@@ -23,6 +23,7 @@
 #pragma obsd err.h #define OBSD_INC_NEXT err.h
 #pragma obsd err.h #include <obsd_inc_next.h>
 
+OBSD_BEGIN_EXTERN_C
 #pragma obsd err OBSD_PUB void err(int, const char *, ...);
 #pragma obsd errc OBSD_PUB void errc(int, int, const char *, ...);
 #pragma obsd errx OBSD_PUB void errx(int, const char *, ...);
@@ -35,5 +36,6 @@
 #pragma obsd warn OBSD_PUB void warn(const char *, ...);
 #pragma obsd warnc OBSD_PUB void warnc(int, const char *, ...);
 #pragma obsd warnx OBSD_PUB void warnx(const char *, ...);
+OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_ERR) */

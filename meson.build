@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-project('libobsd', 'c', version: '1.1.1',
+project('libobsd', 'c', 'cpp', version: '1.1.1',
         license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
@@ -25,6 +25,9 @@ src = []
 man = []
 cc = meson.get_compiler('c')
 
+# Whether our environment supports C++. Not the case with e.g. CompCert,
+# dietlibc.
+cxx_support = true
 # Some systems implement some OpenBSD functions, but need to link in a library
 # or set a macro to expose them.
 #
@@ -38,6 +41,7 @@ elif host_machine.system() == 'netbsd'
 elif cc.has_header_symbol('features.h', '__dietlibc__')
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
   deps += cc.find_library('compat')
+  cxx_support = false
 elif cc.has_header_symbol('features.h', '__NEWLIB__') \
      or cc.has_header_symbol('features.h', '__BIONIC__') \
      or cc.has_header_symbol('features.h', '__GLIBC__')
