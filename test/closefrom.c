@@ -40,7 +40,7 @@ main(void)
 
 	/* Test that closefrom() works at all. */
 	for (i = 10; i < 20; i++)
-		dup2_noerr(0, i);
+		dup2_noerr(1, i);
 	closefrom_r(11);
 	/* Test that a descriptor one less than the minimum wasn't closed. */
 	if (close(10) == -1)

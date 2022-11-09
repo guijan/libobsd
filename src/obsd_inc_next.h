@@ -14,18 +14,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*
- * This header is for internal use by libobsd. Do not use it in your own
- * program.
- */
+/* This header is internal to libobsd, do not use it in your program. */
 
 /* This is an extremely ugly hack for doing #include_next on MSVC. The lack of
  * include guards is intentional.
  *
- * You should see including this header as a function call of sorts. You
- * pass arguments to this function by defining a variable just before calling
- * it, that variable is OBSD_INC_NEXT. You can #define OBSD_INC_NEXT again
- * afterwards.
+ * You should see including this header as a function call of sorts. You pass
+ * this function's argument by defining a variable just before calling it, that
+ * variable is OBSD_INC_NEXT. You can #define OBSD_INC_NEXT again afterwards.
  *
  * Here's how to use it:
  *

@@ -19,22 +19,21 @@
 #if !defined(H_OBSD_DEFS)
 #define H_OBSD_DEFS
 
-#if defined(OBSD_EXPORTING)
-	#if defined(_MSC_VER)
-		/*
-	 	 * __declspec is necessary for variables on MSVC. The compiler
-		 * also supports passing a .def file with a list of symbols to
-		 * export, but I've found that Windows requires exported
-		 * variables to be alinged ot 8 bytes and the .def file doesn't
-		 * guarantee it.
-	 	 */
+#if defined(OBSD_EXPORTING) /* Not enabled for Windows static builds. */
+	#if defined(_WIN32) || defined(__CYGWIN__)
 		#define OBSD_PUB __declspec(dllexport)
 	#else
-		#define OBSD_PUB __attribute__ ((visibility ("default")))
+		#define OBSD_PUB __attribute__((visibility ("default")))
 	#endif
-#elif defined(OBSD_IMPORTING)
+#elif defined(OBSD_IMPORTING) /* Only enabled for Windows shared builds. */
 	#define OBSD_PUB __declspec(dllimport)
 #else
+	/* The Windows __declspec(export) and __declspec(import) directives must
+	 * not be used when statically linking. Additionally, non-Windows
+	 * platforms don't require a special directive for importing. We don't
+	 * use a .def file because Windows requires exported variables to be
+	 * aligned to 8 bytes and the .def file doesn't guarantee it.
+	 */
 	#define OBSD_PUB
 #endif
 

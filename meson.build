@@ -55,7 +55,7 @@ elif cc.has_header_symbol('features.h', '_GNU_SOURCE',
                           #undef _GNU_SOURCE
                           ''')
   # musl doesn't want to be detected, so it doesn't provide its own #define.
-  # However, it appears to have an unique behavior that is easy to detect:
+  # However, it appears to have a unique behavior that is easy to detect:
   # musl's features.h defines _GNU_SOURCE if _ALL_SOURCE is defined. _ALL_SOURCE
   # appears to be an original musl extension.
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
@@ -70,12 +70,6 @@ endif
 # user_args are compiler args that users of this library NEED to use.
 user_args = args
 
-args += '-DOBSD_EXPORTING'
-ms_windows = host_machine.system() == 'windows' \
-             or host_machine.system() == 'cygwin'
-if ms_windows
-  user_args += '-DOBSD_IMPORTING'
-endif
 if cc.get_argument_syntax() == 'msvc'
   args += '-D_CRT_SECURE_NO_WARNINGS'
 endif
@@ -84,20 +78,37 @@ if cc.get_id() == 'msvc'
   args += '/Qspectre'
 endif
 
-inst_h = not meson.is_subproject()
+subproj = meson.is_subproject()
+
+inst_h = not subproj
 h_inst_dir = get_option('includedir') / 'obsd'
-# We do have global args, but I've chosen to pass them manually where they're
-# needed, so add_global_arguments isn't used.
 subdir('src')
 
-if meson.is_subproject()
-  libobsd = static_library('obsd', src + gen_inc,
-                           c_args: args,
-                           install: false,
-                           include_directories: incdir,
-                           dependencies: deps,
-                           gnu_symbol_visibility: 'hidden')
-  if host_machine.system() == 'windows' or host_machine.system() == 'cygwin'
+windows_host = ['windows', 'cygwin'].contains(host_machine.system())
+src += gen_inc
+link = []
+if windows_host
+  if get_option('default_library') == 'both'
+    error('building both libraries is not supported under Windows')
+  elif get_option('default_library') == 'shared'
+    args += '-DOBSD_EXPORTING'
+    user_args += '-DOBSD_IMPORTING'
+  endif
+else
+  args += '-DOBSD_EXPORTING'
+  if subproj
+    link += 'default_library=static'
+  endif
+endif
+libobsd = library('obsd', src,
+                  c_args: args,
+                  install: not subproj,
+                  include_directories: incdir,
+                  dependencies: deps,
+                  gnu_symbol_visibility: 'hidden',
+                  override_options: link)
+if subproj
+  if windows_host
     custom_target('license',
                   command: ['unix2dos'],
                   input: 'LICENSE.txt',
@@ -111,27 +122,20 @@ if meson.is_subproject()
                    copy: true)
   endif
 else
-  libobsd = library('obsd', src + gen_inc,
-                    c_args: args,
-                    install: true,
-                    include_directories: incdir,
-                    dependencies: deps,
-                    gnu_symbol_visibility: 'hidden')
-
   install_man(man)
+
   pkg = import('pkgconfig')
   pkg.generate(libobsd,
+               name: 'libobsd',
                description: 'Transparent OpenBSD compatibility library',
                filebase: 'libobsd',
-               libraries: libobsd,
-               name: 'libobsd',
+               url: 'https://github.com/guijan/libobsd',
                subdirs: 'obsd',
                # Kitchen sink approach: OpenBSD makes all symbols visible by
                # default. We need to provide declarations for the OpenBSD
                # functions the system provides, the easiest way to do this is to
                # just tell the system to show all of its functions too.
-               extra_cflags: user_args,
-               url: 'https://github.com/guijan/libobsd')
+               extra_cflags: user_args)
   if get_option('provide_libbsd')
     # https://mesonbuild.com/Pkgconfig-module.html
     # "install_dir the directory to install to, defaults to the value of option
@@ -143,8 +147,8 @@ else
 endif
 
 libobsd_dep = declare_dependency(link_with: libobsd,
-                                 sources: gen_inc,
                                  dependencies: deps,
                                  include_directories: incdir,
+                                 sources: gen_inc,
                                  compile_args: user_args)
 subdir('test')

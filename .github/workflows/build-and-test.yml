@@ -64,7 +64,6 @@ jobs:
   emscripten:
     runs-on: macos-latest
     steps:
-      - uses: actions/setup-python@v4.2.0
       - name: setup
         run: |
           brew update
@@ -146,7 +145,6 @@ jobs:
   macos:
     runs-on: macos-latest
     steps:
-      - uses: actions/setup-python@v4.2.0
       - run: |
           brew update
           brew install meson samurai

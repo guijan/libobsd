@@ -1,0 +1,68 @@
+# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+name: 'Integration Testing'
+on: [push, pull_request]
+
+jobs:
+  msys2:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      matrix:
+        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
+    steps:
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{matrix.sys}}
+          update: true
+          path-type: strict
+          install: groff pactoys dos2unix
+      - name: setup
+        run: |
+          # Lines stolen from:
+          # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
+          grep -qF '[clang32]' /etc/pacman.conf || sed -i \
+              '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' \
+              /etc/pacman.conf
+          pacman --noconfirm -Suuy
+          pacboy --noconfirm -S --needed clang:p meson:p ninja:p pkg-config:p
+      - uses: actions/checkout@v3.0.2
+      - uses: actions/checkout@v3.0.2
+        with:
+          repository: guijan/dictpw
+          path: dictpw
+      - name: shared test
+        run: |
+          meson setup -Dprovide_libbsd=true build
+          meson install -C build
+          cd dictpw
+          meson setup build
+          meson compile -C build
+      - name: static test
+        run: |
+          meson setup -Dprovide_libbsd=true -Ddefault_library=static --wipe \
+              build
+          meson install -C build
+          cd dictpw
+          meson setup -Dstatic_deps=true build
+          meson compile -C build
+      - uses: actions/upload-artifact@v3.1.0
+        if: always()
+        with:
+          name: meson-logs-int-${{matrix.sys}}
+          path: |
+            build/meson-logs
