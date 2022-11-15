@@ -33,9 +33,9 @@ OBSD_BEGIN_EXTERN_C
  * away entirely, but the functions are in the library in case the programmer
  * does something weird.
  */
-#pragma obsd pledge #define pledge(unused1, unused2) ((int)0)
+#pragma obsd pledge #define pledge(unused1, unused2) ((void)0, 0)
 #pragma obsd pledge OBSD_PUB int (pledge)(const char *, const char *);
-#pragma obsd unveil #define unveil(unused1, unused2) ((int)0)
+#pragma obsd unveil #define unveil(unused1, unused2) ((void)0, 0)
 #pragma obsd unveil OBSD_PUB int (unveil)(const char *, const char *);
 
 #pragma obsd getopt OBSD_PUB int getopt(int, char * const *, const char *);

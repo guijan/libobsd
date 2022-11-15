@@ -36,7 +36,7 @@ main(void)
 	explicit_bzero(buf, sizeof(buf));
 	strlcpy(buf, "test string", sizeof(buf));
 	strlcat(buf, "another test string", sizeof(buf));
-	memrchr(buf, '\0', sizeof(buf));
+	(void)memrchr(buf, '\0', sizeof(buf));
 	p = buf;
 	strsep(&p, "t");
 
@@ -46,7 +46,7 @@ main(void)
 	setproctitle("%s", "cxx test"); /* Don't need setproctitle_init. */
 	strtonum("1", 0, 128, NULL);
 	arc4random();
-	getprogname();
+	(void)getprogname();
 
 	/* unistd.h */
 	closefrom(3);
