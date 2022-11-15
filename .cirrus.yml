@@ -78,4 +78,5 @@ task:
   setup_script:
     - pkg install -y ninja clang python
     - pip install meson
+    - update-static-dns # repository addresses become outdated sometimes
   << : *common_script
