@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-project('libobsd', 'c', 'cpp', version: '1.1.1',
+project('libobsd', 'c', 'cpp', version: '1.1.1', meson_version: '>= 0.61.0',
         license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
         default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
 
