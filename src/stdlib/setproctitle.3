@@ -18,48 +18,40 @@
 .Dt SETPROCTITLE 3
 .Os
 .Sh NAME
-.Nm setproctitle ,
-.Nm setproctitle_init
+.Nm setproctitle_init ,
+.Nm setproctitle
 .Nd set process title
 .Sh SYNOPSIS
 .In stdlib.h
-.Fd #if defined(SETPROCTITLE_INIT)
+.Fd #if defined(setproctitle_init)
 .Ft void
 .Fn setproctitle_init "int argc" "char *argv[]" "char *envp[]"
 .Fd #endif
 .Ft void
 .Fn setproctitle "const char *fmt" "..."
 .Sh DESCRIPTION
-The
-.Fn setproctitle_init
-function is a necessary evil in this
-.Ox
-compatibility library.
 If
-.Dv SETPROCTITLE_INIT
+.Dv setproctitle_init
 is defined,
 call
-.Fn setproctitle_init
-in your
-.Fn main
-function before using
+.Fn setproctitle_init "argc" "argv" "environ"
+before using
 .Fa argc ,
 .Fa argv ,
 or the environment.
-.Fa envp
-should be the global variable
-.Va environ .
 .Pp
 The
 .Fn setproctitle
 function sets the process' title; the title is set to the program's name as
 returned by
-.Xr getprogname 3
+.Xr getprogname 3 ,
 followed by a colon, a space, and the output of
-.Xr vsnprintf 3
-when passed
+.Xr printf 3
+with
 .Fa fmt
-and the variable arguments.
+and
+.Fa ...
+as arguments.
 The title is limited to 2048 bytes.
 .Pp
 If
@@ -76,13 +68,30 @@ it is no-op.
 .Fn setproctitle_init
 is compatible with libbsd.
 .Sh EXAMPLES
-Here's a complete program which should build unmodified across
-.Ox
-itself as
-well as Linux, Windows, Mac OS, and all other operating systems officially
-supported by libobsd, and which showcases the usage of
+As far as
+.Fn setproctitle_init ,
+.Fn setproctitle ,
+and their users are concerned, there are 3 kinds of systems:
+.Bl -bullet
+.It
+Systems in which libobsd is not used because it's not needed.
+.It
+Systems in which libobsd is in use, and libobsd's
+.Fn setproctitle
+does not need initialization.
+.It
+Systems in which libobsd is in use, and libobsd's
+.Fn setproctitle
+needs initialization.
+.El
+.Pp
+The following is a complete program listing which works unmodified across all 3
+kinds of systems,
+and showcases proper usage of
+.Fn setproctitle_init
+and
 .Fn setproctitle :
-.Bd -literal
+.Bd -literal -offset indent
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -93,7 +102,7 @@ main(int argc, char *argv[])
 	int ch;
 	char *tflag;
 
-#if defined(SETPROCTITLE_INIT)
+#if defined(setproctitle_init)
 	extern char **environ;
 	setproctitle_init(argc, argv, environ);
 #endif
@@ -110,7 +119,7 @@ main(int argc, char *argv[])
 	}
 
 	if (tflag == NULL)
-		setproctitle(NULL);
+		setproctitle("libobsd setproctitle");
 	else
 		setproctitle("%s", tflag);
 	fputs("Press enter to exit: ", stdout);
@@ -123,16 +132,24 @@ main(int argc, char *argv[])
 .Xr vsnprintf 3
 .Sh CAVEATS
 .Fn setproctitle_init
-is a necessary libbsd extension.
-.Pp
-.Dv SETPROCTITLE_INIT
-is a libobsd extension to
-.Fn setproctitle_init .
+is a necessary libbsd extension and does not exist on
+.Ox .
 .Pp
 The process' title may be truncated to less than 2048 bytes in some cases.
 .Pp
 A
 .Fn setproctitle NULL
 call doesn't set the title to the original title.
-The original title might have contained the arguments passed to the program, for
-instance.
+It only sets the title to the program name,
+the original might have contained the program's path and arguments.
+.Pp
+Do not pass an user-supplied string as the value of
+.Fa fmt .
+Format specifiers in
+.Fa fmt
+will be interpreted and can be used to manipulate the stack,
+this is a security vulnerability.
+Always use the secure idiom:
+.Bd -literal -offset indent
+setproctitle("%s", str);
+.Ed
