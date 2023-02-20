@@ -14,25 +14,22 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: April 20 2022 $
+.Dd $Mdocdate: February 20 2023 $
 .Dt SETPROCTITLE 3
 .Os
 .Sh NAME
-.Nm setproctitle_init ,
 .Nm setproctitle
 .Nd set process title
 .Sh SYNOPSIS
 .In stdlib.h
-.Fd #if defined(setproctitle_init)
 .Ft void
 .Fn setproctitle_init "int argc" "char *argv[]" "char *envp[]"
-.Fd #endif
 .Ft void
 .Fn setproctitle "const char *fmt" "..."
 .Sh DESCRIPTION
-If
-.Dv setproctitle_init
-is defined,
+If libobsd has a
+.Fn setproctitle_init
+function,
 call
 .Fn setproctitle_init "argc" "argv" "environ"
 before using
@@ -102,7 +99,7 @@ main(int argc, char *argv[])
 	int ch;
 	char *tflag;
 
-#if defined(setproctitle_init)
+#if defined(HAVE_SETPROCTITLE_INIT)
 	extern char **environ;
 	setproctitle_init(argc, argv, environ);
 #endif
@@ -119,14 +116,23 @@ main(int argc, char *argv[])
 	}
 
 	if (tflag == NULL)
-		setproctitle("libobsd setproctitle");
-	else
-		setproctitle("%s", tflag);
+		tflag = "libobsd setproctitle";
+	setproctitle("%s", tflag);
 	fputs("Press enter to exit: ", stdout);
 	fflush(stdout);
 	getchar();
 }
 .Ed
+The build system should be used to to define
+.Dv HAVE_SETPROCTITLE_INIT .
+The build system's logic should spell out
+.Qo
+if I am using libobsd,
+and libobsd has
+.Fn setproctitle_init ,
+then define
+.Dv HAVE_SETPROCTITLE_INIT
+.Qc .
 .Sh SEE ALSO
 .Xr getprogname 3 ,
 .Xr vsnprintf 3
@@ -140,7 +146,7 @@ The process' title may be truncated to less than 2048 bytes in some cases.
 A
 .Fn setproctitle NULL
 call doesn't set the title to the original title.
-It only sets the title to the program name,
+It only sets the title to the current program name,
 the original might have contained the program's path and arguments.
 .Pp
 Do not pass an user-supplied string as the value of
