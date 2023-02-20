@@ -45,4 +45,23 @@
 	#define	OBSD_END_EXTERN_C
 #endif
 
+#if defined(__has_attribute)
+	#define OBSD_HAS_GNUC_ATTR(attr) __has_attribute(attr)
+#else
+	#define OBSD_HAS_GNUC_ATTR(attr) 0
+#endif
+
+/* As the standard and preferred version explains, OBSD_DEAD specifies that a
+ * function does not return.
+ */
+#if __STDC_VERSION__ >= 201112L
+	#define OBSD_DEAD _Noreturn
+#elif OBSD_HAS_GNUC_ATTR(noreturn)
+	#define OBSD_DEAD __attribute__((noreturn))
+#elif defined(_MSC_VER)
+	#define OBSD_DEAD __declspec(noreturn)
+#else
+	#define OBSD_DEAD
+#endif
+
 #endif /* !defined(H_OBSD_DEFS) */
