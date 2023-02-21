@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+ * Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -52,7 +52,10 @@ daemon(int nochdir, int noclose)
 			 */
 			homedrive = "/";
 		}
-		(void)chdir(homedrive);
+		/* chdir() is forbidden in UWP but _chdir() is not for whatever
+		 * reason.
+		 */
+		(void)_chdir(homedrive);
 	}
 
 	if (!noclose) {

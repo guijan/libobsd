@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -116,7 +116,10 @@ options](https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options-l
 I can't find MSVCRT documentation. It's best to browse MinGW headers and then
 trial and error the build in that case.
 
-[using __declspec(dllimport)](https://docs.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport?view=msvc-170)
+[Using __declspec(dllimport).](https://docs.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport)
+[CRT functions not supported in Universal Windows Platform apps.](https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps)
+It seems some functions like `RtlGenRandom()` have UWP availability listed in the
+function's page, while others like `chdir()` have it in that page.
 
 The oldest supported Windows version is Windows 7 for a variety of reasons.
 When making Windows syscalls, check that they're supported by Windows 7, and
