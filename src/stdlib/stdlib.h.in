@@ -38,12 +38,12 @@ OBSD_BEGIN_EXTERN_C
 #pragma obsd recallocarray OBSD_PUB void *recallocarray(void *, size_t, size_t,
 #pragma obsd recallocarray     size_t);
 
-#pragma obsd setproctitle_init OBSD_PUB void setproctitle_init(int, char **,
-#pragma obsd setproctitle_init     char **);
+#pragma obsd setproctitle_init OBSD_PUB void setproctitle_init(int,
+#pragma obsd setproctitle_init     char *[OBSD_NONNULL], char *[OBSD_NONNULL]);
 #pragma obsd setproctitle OBSD_PUB void setproctitle(const char *, ...);
 
-#pragma obsd strtonum OBSD_PUB long long strtonum(const char *, long long,
-#pragma obsd strtonum     long long, const char **);
+#pragma obsd strtonum OBSD_PUB long long strtonum(const char[OBSD_NONNULL],
+#pragma obsd strtonum     long long, long long, const char **);
 OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_STDLIB) */

@@ -64,4 +64,17 @@
 	#define OBSD_DEAD
 #endif
 
+/* OBSD_NONNULL is placed inside the brackets of an array function parameter to
+ * say that the pointer cannot be NULL.
+ *
+ * XXX: Add a version for void pointers, which can't be made into arrays.
+ */
+#if __STDC_VERSION__ >= 199901L
+	#define OBSD_NONNULL static 1
+#elif OBSD_HAS_GNUC_ATTR(nonnull)
+	#define OBSD_NONNULL __attribute__((nonnull))
+#else
+	#define OBSD_NONNULL
+#endif
+
 #endif /* !defined(H_OBSD_DEFS) */

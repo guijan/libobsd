@@ -26,10 +26,13 @@ OBSD_BEGIN_EXTERN_C
 
 #pragma obsd memrchr OBSD_PUB void *memrchr(const void *, int, size_t);
 
-#pragma obsd strlcpy OBSD_PUB size_t strlcpy(char *, const char *, size_t);
-#pragma obsd strlcat OBSD_PUB size_t strlcat(char *, const char *, size_t);
+#pragma obsd strlcpy OBSD_PUB size_t strlcpy(char *, const char[OBSD_NONNULL],
+#pragma obsd strlcpy OBSD_PUB size_t     size_t);
+#pragma obsd strlcat OBSD_PUB size_t strlcat(char *, const char[OBSD_NONNULL],
+#pragma obsd strlcat OBSD_PUB size_t     size_t);
 
-#pragma obsd strsep OBSD_PUB char *strsep(char **, const char *);
+#pragma obsd strsep OBSD_PUB char *strsep(char [OBSD_NONNULL][OBSD_NONNULL],
+#pragma obsd strsep OBSD_PUB char     char [OBSD_NONNULL]);
 OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_STRING) */

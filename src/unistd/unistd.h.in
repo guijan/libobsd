@@ -38,7 +38,8 @@ OBSD_BEGIN_EXTERN_C
 #pragma obsd unveil #define unveil(unused1, unused2) ((void)0, 0)
 #pragma obsd unveil OBSD_PUB int (unveil)(const char *, const char *);
 
-#pragma obsd getopt OBSD_PUB int getopt(int, char * const *, const char *);
+#pragma obsd getopt OBSD_PUB int getopt(int, char *[const OBSD_NONNULL],
+#pragma obsd getopt OBSD_PUB     const char[OBSD_NONNULL]);
 #pragma obsd optarg OBSD_PUB extern char *optarg;
 #pragma obsd opterr OBSD_PUB extern int opterr;
 #pragma obsd optind OBSD_PUB extern int optind;

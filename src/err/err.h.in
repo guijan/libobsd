@@ -24,19 +24,25 @@
 #pragma obsd err.h #include <obsd_inc_next.h>
 
 OBSD_BEGIN_EXTERN_C
-#pragma obsd err OBSD_PUB OBSD_DEAD void err(int, const char *, ...);
-#pragma obsd errc OBSD_PUB OBSD_DEAD void errc(int, int, const char *, ...);
-#pragma obsd errx OBSD_PUB OBSD_DEAD void errx(int, const char *, ...);
-#pragma obsd verr OBSD_PUB OBSD_DEAD void verr(int, const char *, va_list);
-#pragma obsd verrc OBSD_PUB OBSD_DEAD void verrc(int, int, const char *,
-#pragma obsd verrc     va_list);
-#pragma obsd verrx OBSD_PUB OBSD_DEAD void verrx(int, const char *, va_list);
-#pragma obsd vwarn OBSD_PUB void vwarn(const char *, va_list);
-#pragma obsd vwarnc OBSD_PUB void vwarnc(int, const char *, va_list);
-#pragma obsd vwarnx OBSD_PUB void vwarnx(const char *, va_list);
-#pragma obsd warn OBSD_PUB void warn(const char *, ...);
-#pragma obsd warnc OBSD_PUB void warnc(int, const char *, ...);
-#pragma obsd warnx OBSD_PUB void warnx(const char *, ...);
+#pragma obsd err OBSD_PUB OBSD_DEAD void err(int, const char[OBSD_NONNULL],
+#pragma obsd err     ...);
+#pragma obsd errc OBSD_PUB OBSD_DEAD void errc(int, int,
+#pragma obsd errc     const char[OBSD_NONNULL], ...);
+#pragma obsd errx OBSD_PUB OBSD_DEAD void errx(int, const char[OBSD_NONNULL],
+#pragma obsd errx     ...);
+#pragma obsd verr OBSD_PUB OBSD_DEAD void verr(int, const char[OBSD_NONNULL],
+#pragma obsd verr     va_list);
+#pragma obsd verrc OBSD_PUB OBSD_DEAD void verrc(int, int,
+#pragma obsd verrc     const char[OBSD_NONNULL], va_list);
+#pragma obsd verrx OBSD_PUB OBSD_DEAD void verrx(int, const char[OBSD_NONNULL],
+#pragma obsd verrx     va_list);
+#pragma obsd vwarn OBSD_PUB void vwarn(const char[OBSD_NONNULL], va_list);
+#pragma obsd vwarnc OBSD_PUB void vwarnc(int, const char[OBSD_NONNULL],
+#pragma obsd vwarnc     va_list);
+#pragma obsd vwarnx OBSD_PUB void vwarnx(const char[OBSD_NONNULL], va_list);
+#pragma obsd warn OBSD_PUB void warn(const char[OBSD_NONNULL], ...);
+#pragma obsd warnc OBSD_PUB void warnc(int, const char[OBSD_NONNULL], ...);
+#pragma obsd warnx OBSD_PUB void warnx(const char[OBSD_NONNULL], ...);
 OBSD_END_EXTERN_C
 
 #endif /* !defined(H_OBSD_ERR) */
