@@ -38,7 +38,6 @@ OBSD_BEGIN_EXTERN_C
 #pragma obsd recallocarray OBSD_PUB void *recallocarray(void *, size_t, size_t,
 #pragma obsd recallocarray     size_t);
 
-#pragma obsd setproctitle_init #define setproctitle_init setproctitle_init
 #pragma obsd setproctitle_init OBSD_PUB void setproctitle_init(int, char **,
 #pragma obsd setproctitle_init     char **);
 #pragma obsd setproctitle OBSD_PUB void setproctitle(const char *, ...);
