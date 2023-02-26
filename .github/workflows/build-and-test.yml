@@ -20,7 +20,7 @@ on: [push, pull_request]
 # it's the one that requires the least hacks.
 jobs:
   dietlibc:
-    runs-on: ubuntu-22.04 # 20.04 uses kernel 5.8, we need 5.9+
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4.5.0
       - name: setup
@@ -68,15 +68,14 @@ jobs:
           path: build/meson-logs
 
   glibc:
-    # Need Ubuntu >= 22.04 because glibc 2.34 is required for closefrom().
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4.5.0
       - name: setup
         run: |
           pip install meson ninja
           sudo apt update
-          sudo apt upgrade -y libasan6
+          sudo apt install -y libasan6
       - uses: actions/checkout@v3.3.0
       - name: build
         run: |
