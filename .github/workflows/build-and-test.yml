@@ -184,7 +184,7 @@ jobs:
         if: always()
         with:
           name: meson-logs-${{matrix.sys}}
-          path: build/meson-logs
+          path: build
 
   MSYS:
     runs-on: windows-latest
