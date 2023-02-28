@@ -23,23 +23,26 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
-        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
+        include:
+          - { sys: msys2,                                 compiler: gcc}
+          - { sys: mingw64, env: mingw-w64-x86_64-,       compiler: gcc }
+          - { sys: mingw32, env: mingw-w64-i686-,         compiler: gcc }
+          - { sys: ucrt64,  env: mingw-w64-ucrt-x86_64-,  compiler: clang }
+          - { sys: clang64, env: mingw-w64-clang-x86_64-, compiler: clang }
+          - { sys: clang32, env: mingw-w64-clang-i686-,   compiler: clang }
     steps:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.sys}}
           update: true
-          path-type: strict
-          install: groff pactoys dos2unix
-      - name: setup
-        run: |
-          # Lines stolen from:
-          # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
-          grep -qF '[clang32]' /etc/pacman.conf || sed -i \
-              '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' \
-              /etc/pacman.conf
-          pacman --noconfirm -Suuy
-          pacboy --noconfirm -S --needed clang:p meson:p ninja:p pkg-config:p
+          install: >-
+            groff
+            pactoys
+            dos2unix
+            ${{matrix.env}}${{matrix.compiler}}
+            ${{matrix.env}}meson
+            ${{matrix.env}}ninja
+            ${{matrix.env}}pkg-config
       - uses: actions/checkout@v3.3.0
       - uses: actions/checkout@v3.3.0
         with:
