@@ -20,7 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int err(int, const char *, ...);
+static long long mygetline(char **, size_t *, FILE *);
+static int myerr(int, int, const char *, ...);
 static int strpref(const char *, const char *);
 static int compar_str(const void *, const void *);
 
@@ -37,14 +38,14 @@ static int compar_str(const void *, const void *);
 int
 main(int argc, char *argv[])
 {
-	/* No line in my source code is over 80 chars, but we need 2 more for
-	 * DOS newlines, and 1 more for the '\0' terminator.
-	 */
-	char line[80+2+1];
+	/* Was the previous line a blank line? */
+	int wasblank;
+	char *line;
+	size_t linebufsz;
+	long long linelen;
 	char *p;
 	const char pref[] = "#pragma obsd ";
 	size_t preflen = sizeof(pref)-1;
-	int wasblank;
 
 	/* Move past argv[0]. */
 	argv++;
@@ -55,16 +56,18 @@ main(int argc, char *argv[])
 	 */
 	qsort(argv, argc, sizeof(*argv), compar_str);
 
-	/* Was the previous line a blank line? */
-	wasblank = 0;
+	wasblank = linebufsz = 0;
+	line = NULL;
 	for (;;) {
-		if (fgets(line, sizeof(line), stdin) == NULL) {
-			if (ferror(stdin))
-				err(1, "fgets");
-			break;
-		}
+		if ((linelen = mygetline(&line, &linebufsz, stdin)) == -1) {
+			if (feof(stdin))
+				exit(0);
+			myerr(1, 1, "fgets");
 
-		line[strcspn(line, "\r\n")] = '\0';
+		}
+		if (linelen > 0 && line[linelen-1] == '\n')
+			line[linelen-1] = '\0';
+
 
 		p = line;
 		if (strpref(line, pref)) {
@@ -83,21 +86,66 @@ main(int argc, char *argv[])
 
 		errno = 0;
 		if (puts(p) == EOF && errno != 0)
-			err(1, "puts");
+			myerr(1, 1, "puts");
 	}
 
 	return (0);
 }
 
-/* err: err() for a program that can't count on the system's err() */
+/* mygetline: portable POSIX getline()
+ * Windows doesn't have ssize_t so we use long long.
+ */
+static long long
+mygetline(char **lineptr, size_t *n, FILE *stream)
+{
+	int saved_errno = errno;
+	void *p;
+	unsigned long long i, tmp;
+
+	for (i = 0;; i++) {
+		if (i >= *n) {
+			tmp = i == 0 ? 1 : i * 2;
+			if ((p = realloc(*lineptr, tmp)) == NULL)
+				return -1;
+			*n = tmp;
+			*lineptr = p;
+		}
+		switch ((int)((*lineptr)[i] = fgetc(stream))) {
+		case EOF:
+			if (ferror(stream)) {
+				return -1;
+			} else if (feof(stream)) {
+				if (i == 0)
+					return -1;
+				/* If end of file and i != 0, fallthrough. */
+			} else {
+				break;
+			}
+			/* FALLTHROUGH */
+		case '\n':
+			ungetc('\0', stream);
+			break;
+		case '\0':
+			errno = saved_errno;
+			return i;
+		}
+	}
+	/* NOTREACHED */
+}
+
+/* err: portable version of the BSD err() and errx() functions
+ * If `printerr` is set, print the string associated with the current errno
+ * value.
+ */
 static int
-err(int eval, const char *fmt, ...)
+myerr(int eval, int printerr, const char *fmt, ...)
 {
 	va_list ap;
 
 	va_start(ap, fmt);
 	vfprintf(stderr, fmt, ap);
-	fprintf(stderr, ": %s\n", strerror(errno));
+	if (printerr)
+		fprintf(stderr, ": %s\n", strerror(errno));
 	va_end(ap);
 	exit(eval);
 }
