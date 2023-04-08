@@ -5,7 +5,7 @@ file contains the sum of all the licenses and copyrights of all the files.
 1)
     Copyright (c) 2013 Antoine Jacoutot <ajacoutot@openbsd.org>
     Copyright (c) 2008 Damien Miller <djm@openbsd.org>
-    Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+    Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
     Copyright (c) 2020 Ingo Schwarze <schwarze@openbsd.org>
     Copyright (c) 2004, 2008, 2010-2011, 2016-2017
         Otto Moerbeek <otto@drijf.net>
@@ -78,7 +78,7 @@ file contains the sum of all the licenses and copyrights of all the files.
     POSSIBILITY OF SUCH DAMAGE.
 
 4)
-    Copyright (c) 1980, 1988, 1990, 1991, 1993
+    Copyright (c) 1980, 1982, 1986, 1988, 1990, 1991, 1993
          The Regents of the University of California.  All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

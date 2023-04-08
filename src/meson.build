@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -16,18 +16,17 @@ header_generator = executable('header_generator', 'header_generator.c',
                               c_args: args, native: true)
 
 subdir('err')
+subdir('queue')
 subdir('stdlib')
 subdir('string')
+subdir('time')
 subdir('unistd')
 
-# queue.h is a special case; it only provides a header and handles its own
-# installation.
-subdir('queue')
-
-syms += err_sym + stdlib_sym + string_sym + unistd_sym
-incdir += [err_incdir, stdlib_incdir, string_incdir, unistd_incdir]
+syms += err_sym + queue_sym + stdlib_sym + string_sym + time_sym + unistd_sym
+incdir += [err_incdir, queue_incdir, stdlib_incdir, string_incdir, time_incdir,
+  unistd_incdir]
 src += err_src + stdlib_src + string_src + unistd_src
-man += err_man + stdlib_man + string_man + queue_man + unistd_man
+man += err_man + queue_man + stdlib_man + string_man + time_man + unistd_man
 
 incdir += include_directories('.')
 if inst_h

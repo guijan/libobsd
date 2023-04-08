@@ -64,6 +64,8 @@ queue_macros = [
 ]
 
 queue_man = []
+queue_sym = []
+queue_incdir = []
 
 foreach macro : queue_macros
   if not cc.has_header_symbol('sys/queue.h', macro, args: args,
@@ -74,7 +76,8 @@ foreach macro : queue_macros
       install_headers('sys/queue.h', 'sys/_null.h', subdir: 'obsd' / 'sys')
     endif
     queue_man += files('queue.3')
-    incdir += include_directories('.')
+    queue_incdir += include_directories('.')
+    queue_sym += 'queue'
     break
   endif
 endforeach

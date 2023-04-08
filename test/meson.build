@@ -19,35 +19,15 @@ configure_file(output: 'test_config.h', input: 'test_config.h.in',
   }
 )
 
-tests = {
-  'arc4random': 'arc4random.c',
-  'arc4random_buf': 'arc4random_buf.c',
-  'arc4random_uniform': 'arc4random_uniform.c',
-  'closefrom': 'closefrom.c',
-  'daemon': 'daemon.c',
-  'err': 'err.c',
-  'errc': 'errc.c',
-  'errx': 'errx.c',
-  'explicit_bzero': 'explicit_bzero.c',
-  'memrchr': 'memrchr.c',
-  'freezero': 'freezero.c',
-  'getopt': 'getopt.c',
-  'getprogname': 'getprogname.c',
-  'pledge': 'pledge.c',
-  'reallocarray': 'reallocarray.c',
-  'recallocarray': 'recallocarray.c',
-  'setproctitle': 'setproctitle.c',
-  'strlcat': 'strlcat.c',
-  'strlcpy': 'strlcpy.c',
-  'strsep': 'strsep.c',
-  'strtonum': 'strtonum.c',
-  'unveil': 'unveil.c',
-  'warn': 'warn.c',
-  'warnc': 'warn.c',
-  'warnx': 'warnx.c',
-}
+tests = [
+  'arc4random', 'arc4random_buf', 'arc4random_uniform', 'closefrom', 'daemon',
+  'err', 'errc', 'errx', 'explicit_bzero', 'memrchr', 'freezero', 'getopt',
+  'getprogname', 'pledge', 'reallocarray', 'recallocarray', 'setproctitle',
+  'strlcat', 'strlcpy', 'strsep', 'strtonum', 'time-macros', 'unveil', 'warn',
+  'warnc', 'warnx',
+]
 
-foreach testname, src : tests
+foreach testname : tests
   suite = []
   if syms.contains(testname)
     suite += 'libobsd'
@@ -56,7 +36,7 @@ foreach testname, src : tests
   endif
 
   if suite.length() != 0
-    exe = executable(testname, src, dependencies: libobsd_dep,
+    exe = executable(testname, testname + '.c', dependencies: libobsd_dep,
                      include_directories: include_directories('.'))
     test(testname, exe, suite: suite)
   endif
