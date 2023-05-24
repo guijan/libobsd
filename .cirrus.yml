@@ -71,11 +71,13 @@ task:
   << : *common_script
 
 task:
-  container:
-    image: kcubeterm/termux:x86_64
+  arm_container:
+    image: termux/termux-docker:aarch64
+    docker_arguments:
+      it:
     kvm: true
   name: bionic
   setup_script:
-    - pkg install -y ninja clang python
+    - /entrypoint.sh pkg install -y ninja clang python
     - pip install meson
   << : *common_script
