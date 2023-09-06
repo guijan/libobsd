@@ -104,6 +104,9 @@ libobsd = library('obsd', src,
                   c_args: args,
                   install: not subproj,
                   include_directories: incdir,
+                  # To prevent Meson from making the compiler confuse sys/time.h
+                  # with time.h
+                  implicit_include_directories: false,
                   dependencies: deps,
                   gnu_symbol_visibility: 'hidden',
                   override_options: link)
