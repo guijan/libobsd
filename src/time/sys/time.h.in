@@ -45,19 +45,9 @@
  */
 
 #if !defined(OBSD_H_TIME)
-#define OBSD_H_TIME
-
-/* Meson adds libobsd/src/time/sys to the include path and there's no way to
- * remove it, which means someone might try to include time.h and end up being
- * satisfied by sys/time.h. This will probably cause errors over missing types
- * later (it does on HaikuOS, doesn't seem to on others), so make sure the right
- * time.h is also included.
- */
-#if defined(__HAIKU__)
-	#include <../posix/time.h>
-#endif
 
 #include <obsd_defs.h>
+#include <time.h>
 #pragma obsd sys_time.h #define OBSD_INC_NEXT sys/time.h
 #pragma obsd sys_time.h #include <obsd_inc_next.h>
 
