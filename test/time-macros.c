@@ -22,8 +22,10 @@
 int
 main(void)
 {
-	struct timespec a = {1}, b;
+	struct timespec a, b;
 
+	a.tv_sec = 1;
+	a.tv_nsec = 0;
 	if (!timespecisset(&a))
 		errx(1, "timespeccisset() says tv_sec of 1 is not set");
 	timespecclear(&a);
