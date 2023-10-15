@@ -17,11 +17,11 @@
 #if !defined(H_OBSD_ERR)
 #define H_OBSD_ERR
 
-#pragma obsd verr_func #include <stdarg.h>
-
 #include <obsd_defs.h>
 #pragma obsd err.h #define OBSD_INC_NEXT err.h
 #pragma obsd err.h #include <obsd_inc_next.h>
+
+#pragma obsd verr_func #include <stdarg.h>
 
 OBSD_BEGIN_EXTERN_C
 #pragma obsd err OBSD_PUB OBSD_DEAD void err(int, const char *, ...);

@@ -17,12 +17,12 @@
 #if !defined(H_OBSD_STDLIB)
 #define H_OBSD_STDLIB
 
-#pragma obsd uint32_t #include <stdint.h>
-#pragma obsd unistd_h #include <unistd.h>
-
 #include <obsd_defs.h>
 #define OBSD_INC_NEXT stdlib.h
 #include <obsd_inc_next.h>
+
+#pragma obsd uint32_t #include <stdint.h>
+#pragma obsd unistd_h #include <unistd.h>
 
 OBSD_BEGIN_EXTERN_C
 #pragma obsd arc4random OBSD_PUB uint32_t arc4random(void);
