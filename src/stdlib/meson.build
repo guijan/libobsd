@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022, 2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -39,33 +39,23 @@ foreach func, info : stdlib
 endforeach
 
 if stdlib['arc4random_buf'][2]
-  arc4random_backends = {
-    'getrandom': ['arc4random_buf_getrandom.c', '#include <sys/random.h>'],
-    'BCryptGenRandom': ['arc4random_buf_BCryptGenRandom.c',
-                        '''#include <windows.h>
-                        #include <bcrypt.h>'''],
-
-  }
-
-  if host_machine.system() == 'emscripten'
-    stdlib += {'arc4random_buf': ['arc4random_buf_emscripten.c',
-                                  'arc4random.3', true]}
-  elif host_machine.system() == 'haiku'
-    stdlib += {'arc4random_buf': ['arc4random_buf_dev_urandom.c',
-                                  'arc4random.3', true]}
-  endif
-
   bcrypt_dep = cc.find_library('bcrypt', required: false)
-  if bcrypt_dep.found()
+  bcrypt_pref = '''#include <windows.h>\n#include <bcrypt.h>'''
+  impl = ''
+  if bcrypt_dep.found() and cc.has_function('BCryptGenRandom',
+                                           prefix: bcrypt_pref,
+                                           dependencies: bcrypt_dep)
     deps += bcrypt_dep
+    impl = 'arc4random_buf_BCryptGenRandom.c'
+  elif host_machine.system() == 'emscripten'
+    impl = 'arc4random_buf_emscripten.c'
+  elif cc.has_function('getrandom', args: args,
+                       prefix: '#include <sys/random.h>')
+    impl = 'arc4random_buf_getrandom.c'
   endif
-  foreach func, info : arc4random_backends
-    if cc.has_function(func, args: args, prefix: info[1],
-                       dependencies: deps)
-      stdlib += {'arc4random_buf': [info[0], 'arc4random.3', true]}
-      break
-    endif
-  endforeach
+  if impl != ''
+    stdlib += {'arc4random_buf': [impl, 'arc4random.3', true]}
+  endif
 endif
 
 stdlib_pragma = [] # daemon() needs stdlib_pragma early

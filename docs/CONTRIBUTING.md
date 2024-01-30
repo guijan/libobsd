@@ -1,5 +1,5 @@
 <!--
-Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
+Copyright (c) 2022-2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -39,8 +39,7 @@ Every subdirectory under *src/* is named after a header. *stdlib/* for
 subdirectory belong to that header. Instead of piling up `#ifdef`s, I've chosen
 to split each "backend" that implements a function into its own file.
 
-Feature detection is used unless something is impossible to detect. For
-instance, there is some manual checking for Haiku.
+Feature detection is used unless something is impossible to detect.
 
 I don't intend to implement deprecated functions like `rindex()`, or silly
 functions like `getbsize()`. I trust the underlying platform, if it is buggy, fix

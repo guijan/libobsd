@@ -18,6 +18,8 @@ Changes in libobsd master:
 - Add closefrom()
 - Include io.h in unistd.h on Windows to expose io.h's POSIX functions
 - Add C++ support
-- add timespeccmp(), timespecsub(), and other timeval/timespec macros from
+- Add timespeccmp(), timespecsub(), and other timeval/timespec macros from
   sys/time.h
+- Delete old /dev/urandom backend for arc4random now that HaikuOS doesn't need
+  it anymore
 
