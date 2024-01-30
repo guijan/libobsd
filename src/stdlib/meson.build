@@ -47,6 +47,8 @@ if stdlib['arc4random_buf'][2]
                                            dependencies: bcrypt_dep)
     deps += bcrypt_dep
     impl = 'arc4random_buf_BCryptGenRandom.c'
+  elif host_machine.system() == 'haiku'
+    impl = 'arc4random_buf_dev_urandom.c'
   elif host_machine.system() == 'emscripten'
     impl = 'arc4random_buf_emscripten.c'
   elif cc.has_function('getrandom', args: args,

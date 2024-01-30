@@ -20,6 +20,4 @@ Changes in libobsd master:
 - Add C++ support
 - Add timespeccmp(), timespecsub(), and other timeval/timespec macros from
   sys/time.h
-- Delete old /dev/urandom backend for arc4random now that HaikuOS doesn't need
-  it anymore
 
