@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022-2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -101,8 +101,6 @@ jobs:
         run: 'container-init & timeout 600 vmshell exit 0'
       - name: 'Install packages'
         run: 'vmshell pkgman install -y meson gcc haiku_devel'
-      - name: 'Restart VM in case pkgman wants it'
-        run: 'sv force-restart qemu ||:; timeout 600 vmshell exit 0'
       - name: 'Checkout project'
         uses: 'actions/checkout@main'
       - name: 'Copy project to VM'
