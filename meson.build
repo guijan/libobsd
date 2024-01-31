@@ -42,23 +42,17 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
   deps += cc.find_library('compat')
   cxx_support = false
-elif cc.has_header_symbol('features.h', '__NEWLIB__') \
-     or cc.has_header_symbol('features.h', '__BIONIC__') \
-     or cc.has_header_symbol('features.h', '__GLIBC__')
+elif cc.has_header_symbol('features.h', '__NEWLIB__') or \
+     cc.has_header_symbol('features.h', '__BIONIC__') or \
+     cc.has_header_symbol('features.h', '__GLIBC__') or \
+     cc.has_header_symbol('features.h', '_GNU_SOURCE',
+                          prefix: '''#define _ALL_SOURCE\n#undef _GNU_SOURCE''')
+
   # Some libcs (e.g. uClibc-ng) might set __GLIBC__ in features.h to try to
   # imitate glibc. Make sure we test for __GLIBC__ last for this reason. If the
   # library exposes everything when _GNU_SOURCE is set, then it really does
   # behave like glibc, so put it here if it doesn't require anything else.
   args += ['-D_GNU_SOURCE']
-elif cc.has_header_symbol('features.h', '_GNU_SOURCE',
-                          prefix: '''#define _ALL_SOURCE
-                          #undef _GNU_SOURCE
-                          ''')
-  # musl doesn't want to be detected, so it doesn't provide its own #define.
-  # However, it appears to have a unique behavior that is easy to detect:
-  # musl's features.h defines _GNU_SOURCE if _ALL_SOURCE is defined. _ALL_SOURCE
-  # appears to be an original musl extension.
-  args += ['-D_GNU_SOURCE', '-D_BSD_SOURCE']
 endif
 
 if cc.get_argument_syntax() == 'msvc'
