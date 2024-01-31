@@ -44,10 +44,10 @@ elif cc.has_header_symbol('features.h', '__dietlibc__')
   cxx_support = false
 elif cc.has_header_symbol('features.h', '__NEWLIB__') or \
      cc.has_header_symbol('features.h', '__BIONIC__') or \
-     cc.has_header_symbol('features.h', '__GLIBC__') or \
      cc.has_header_symbol('features.h', '_GNU_SOURCE',
-                          prefix: '''#define _ALL_SOURCE\n#undef _GNU_SOURCE''')
-
+                          prefix:
+                          '''#define _ALL_SOURCE\n#undef _GNU_SOURCE''') or \
+     cc.has_header_symbol('features.h', '__GLIBC__')
   # Some libcs (e.g. uClibc-ng) might set __GLIBC__ in features.h to try to
   # imitate glibc. Make sure we test for __GLIBC__ last for this reason. If the
   # library exposes everything when _GNU_SOURCE is set, then it really does

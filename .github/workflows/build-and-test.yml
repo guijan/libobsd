@@ -19,6 +19,27 @@ on: [push, pull_request]
 # copypasted between jobs. You'll probably want to read the 'glibc:' task first,
 # it's the one that requires the least hacks.
 jobs:
+  bionic:
+    # XXX: Checkout and upload actions don't work, work with termux to fix this
+    # and the need to run /entrypoint.sh ourselves.
+    runs-on: ubuntu-latest
+    container: termux/termux-docker:x86_64
+    steps:
+      - name: setup
+        run: |
+          /entrypoint.sh pkg install -y ninja clang python git
+          /entrypoint.sh pip install meson
+          git clone --depth 1 -b $GITHUB_REF_NAME \
+              https://github.com/$GITHUB_REPOSITORY
+      - name: build
+        run: |
+          meson setup -Dtest_system=true build libobsd
+          meson compile -C build
+      - name: test
+        run: meson test --no-suite system -C build
+      - name: test_system
+        run: meson test --suite system -C build || true
+
   dietlibc:
     runs-on: ubuntu-latest
     steps:
