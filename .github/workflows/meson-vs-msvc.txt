@@ -1,4 +1,0 @@
-[binaries]
-c = 'cl'
-c_ld = 'link'
-cpp = c

@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2023-2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -30,13 +30,16 @@ time_macros = [
 ]
 
 time_needed = false
-foreach macro : time_macros
-  if not cc.has_header_symbol('sys/time.h', macro, args: args,
-                              dependencies: deps)
-    time_needed = true
-    break
-  endif
-endforeach
+if cc.has_type('struct timeval', prefix: '#include <sys/time.h>') and \
+   cc.has_type('struct timespec', prefix: '#include <time.h>')
+  foreach macro : time_macros
+    if not cc.has_header_symbol('sys/time.h', macro, args: args,
+                                dependencies: deps)
+      time_needed = true
+      break
+    endif
+  endforeach
+endif
 
 time_incdir = []
 time_man = []

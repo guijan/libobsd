@@ -56,7 +56,8 @@ main(int argc, char *argv[])
 	 */
 	qsort(argv, argc, sizeof(*argv), compar_str);
 
-	wasblank = linebufsz = 0;
+	wasblank = 0;
+	linebufsz = 0;
 	line = NULL;
 	for (;;) {
 		if ((linelen = mygetline(&line, &linebufsz, stdin)) == -1) {

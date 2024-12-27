@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022, 2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -23,9 +23,14 @@ tests = [
   'arc4random', 'arc4random_buf', 'arc4random_uniform', 'closefrom', 'daemon',
   'err', 'errc', 'errx', 'explicit_bzero', 'memrchr', 'freezero', 'getopt',
   'getprogname', 'pledge', 'reallocarray', 'recallocarray', 'setproctitle',
-  'strlcat', 'strlcpy', 'strsep', 'strtonum', 'time-macros', 'unveil', 'warn',
+  'strlcat', 'strlcpy', 'strsep', 'strtonum', 'unveil', 'warn',
   'warnc', 'warnx',
 ]
+
+if cc.has_type('struct timeval', prefix: '#include <sys/time.h>') and \
+   cc.has_type('struct timespec', prefix: '#include <time.h>')
+  tests += 'time-macros'
+endif
 
 foreach testname : tests
   suite = []

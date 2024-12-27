@@ -1,2 +1,0 @@
-[built-in options]
-c_args = ['-DWINAPI_FAMILY=WINAPI_FAMILY_APP']

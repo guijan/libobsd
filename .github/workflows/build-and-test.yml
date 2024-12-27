@@ -256,26 +256,20 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        cc: [clang, msvc]
-        api: [win32, uwp]
-        arch: [aarch64, amd64]
+        cc: [cl, clang-cl]
     steps:
       - uses: actions/setup-python@v4.5.0
-      - run: pip install meson
+      - run: pip install meson ninja
       - uses: actions/checkout@v3.3.0
+      - uses: ilammy/msvc-dev-cmd@v1.13.0
       - name: build
         run: |
-          if ("${{matrix.api}}" -eq "uwp") {
-            $uwp = "--cross-file=.github/workflows/meson-vs-uwp.txt"
+          pwsh -c { 
+            $env:CC="${{ matrix.cc }}"; 
+            # Don't do debug builds because that triggers a Windows bug:
+            # https://developercommunity.visualstudio.com/t/_setmaxstdio-hangs-the-program-if-the/10164855?space=62&q=setmaxstdio&viewtype=all
+            meson setup build --buildtype=release -Dtest_system=true
           }
-          if ("${{matrix.arch}}" -eq "aarch64") {
-            $arm = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
-          }
-          # Don't do debug builds because that triggers a Windows bug:
-          # https://developercommunity.visualstudio.com/t/_setmaxstdio-hangs-the-program-if-the/10164855?space=62&q=setmaxstdio&viewtype=all
-          meson setup $uwp $arm $build $asan --buildtype=release --backend=vs `
-              --cross-file .github/workflows/meson-vs-${{matrix.cc}}.txt `
-              -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -284,5 +278,5 @@ jobs:
       - uses: actions/upload-artifact@v3.1.2
         if: always()
         with:
-          name: meson-logs-vs-${{matrix.cc}}-${{matrix.api}}-${{matrix.arch}}
+          name: meson-logs-vs-${{matrix.cc}}
           path: build/meson-logs
