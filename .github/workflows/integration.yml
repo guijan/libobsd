@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022-2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -23,46 +23,34 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
-        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
+        sys: [msys, mingw64, mingw32, ucrt64, clang64]
+        link: [shared, static]
     steps:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.sys}}
-          update: true
           path-type: strict
-          install: groff pactoys dos2unix
-      - name: setup
-        run: |
-          # Lines stolen from:
-          # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
-          grep -qF '[clang32]' /etc/pacman.conf || sed -i \
-              '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' \
-              /etc/pacman.conf
-          pacman --noconfirm -Suuy
-          pacboy --noconfirm -S --needed clang:p meson:p ninja:p pkg-config:p
-      - uses: actions/checkout@v3.3.0
-      - uses: actions/checkout@v3.3.0
+          pacboy: |
+            gcc:p meson:p ninja:p pkgconf:p groff: dos2unix:
+      - uses: actions/checkout@v3.3.0 # checkout libobsd
+      - uses: actions/checkout@v3.3.0 # checkout dictpw
         with:
           repository: guijan/dictpw
           path: dictpw
-      - name: shared test
+      - name: ${{matrix.link}} test
         run: |
-          meson setup -Dprovide_libbsd=true build
+          # Meson's default destdir on MSYS isn't in pkgconf's default search 
+          # path.
+          export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+          meson setup build -Db_lto=false -Dprovide_libbsd=true \
+            -Ddefault_library=${{matrix.link}}
           meson install -C build
           cd dictpw
-          meson setup build
-          meson compile -C build
-      - name: static test
-        run: |
-          meson setup -Dprovide_libbsd=true -Ddefault_library=static --wipe \
-              build
-          meson install -C build
-          cd dictpw
-          meson setup -Dstatic_deps=true build
+          meson setup build -Db_lto=false --wrap-mode=nofallback
           meson compile -C build
       - uses: actions/upload-artifact@v3.1.2
         if: always()
         with:
-          name: meson-logs-int-${{matrix.sys}}
+          name: meson-logs-int-${{matrix.sys}}-${{matrix.link}}
           path: |
             build/meson-logs

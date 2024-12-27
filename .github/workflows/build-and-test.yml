@@ -173,27 +173,21 @@ jobs:
         shell: msys2 {0}
     strategy:
       matrix:
-        sys: [mingw64, mingw32, ucrt64, clang64, clang32]
+        # clang32 was broken last time I tried
+        sys: [msys, mingw64, mingw32, ucrt64, clang64]
     steps:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: ${{matrix.sys}}
-          update: true
           path-type: strict
-          install: pactoys
-      - name: setup
-        run: |
-          # Lines stolen from:
-          # https://github.com/msys2/MINGW-packages/blob/56dd3261b3e67c901e45f9314b671ea19104bc0e/.github/workflows/main.yml#L56-L63
-          grep -qF '[clang32]' /etc/pacman.conf || sed -i \
-              '1s|^|[clang32]\nInclude = /etc/pacman.d/mirrorlist.mingw\n|' \
-              /etc/pacman.conf
-          pacman --noconfirm -Suuy
-          pacboy --noconfirm -S --needed clang:p meson:p ninja:p
+          pacboy: gcc:p meson:p ninja:p
       - uses: actions/checkout@v3.3.0
       - name: build
         run: |
-          meson setup -Dtest_system=true build
+          # LTO breaks msys (other environments seem to work): 
+          # https://github.com/msys2/MINGW-packages/issues/11706
+          # contributor says "not really production ready on windows"
+          meson setup -Db_lto=false -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
@@ -203,32 +197,6 @@ jobs:
         if: always()
         with:
           name: meson-logs-${{matrix.sys}}
-          path: build/meson-logs
-
-  MSYS:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-      - uses: msys2/setup-msys2@v2
-        with:
-          msystem: MSYS
-          path-type: strict
-          install: git gcc clang meson ninja
-      - uses: actions/checkout@v3.3.0
-      - name: build
-        run: |
-          meson setup -Dtest_system=true build
-          meson compile -C build
-      - name: test
-        run: meson test --no-suite system -C build
-      - name: test_system
-        run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
-        if: always()
-        with:
-          name: meson-logs-msys2
           path: build/meson-logs
 
   netbsd:
