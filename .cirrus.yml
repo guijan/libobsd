@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (C) 2022,2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to
@@ -21,10 +21,7 @@
 
 common_template: &common_script
   build_script:
-    - if command -v ccomp; then
-    -   export native_file=--native-file=.github/workflows/meson-compcert.txt
-    - fi
-    - meson setup $native_file -Dtest_system=true build
+    - meson setup build $native_file -Dtest_system=true
     - meson compile -C build
   test_script:
     - meson test --no-suite system -C build
@@ -43,22 +40,6 @@ task:
   name: musl
   setup_script:
     - apk add meson alpine-sdk clang linux-headers
-  << : *common_script
-
-task:
-  container:
-    image: artixlinux/base
-    kvm: true
-  name: compcert
-  aur_script:
-    - printf '%s\n%s\n' '[xuanrui]'
-             'Server = https://www.math.nagoya-u.ac.jp/~x18004y/repo/'
-             >> /etc/pacman.conf
-    - pacman-key --init
-    - pacman-key --recv-keys 6E06FBC8
-    - pacman-key --lsign-key 6E06FBC8
-  setup_script:
-    - pacman --noconfirm -Syu compcert ninja meson git linux-headers
   << : *common_script
 
 task:
