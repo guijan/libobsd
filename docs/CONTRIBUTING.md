@@ -42,8 +42,8 @@ to split each "backend" that implements a function into its own file.
 Feature detection is used unless something is impossible to detect.
 
 I don't intend to implement deprecated functions like `rindex()`, or silly
-functions like `getbsize()`. I trust the underlying platform, if it is buggy, fix
-the bug at the source instead of working around it.
+functions like `getbsize()`. I trust the underlying platform, if it is buggy,
+fix the bug at the source instead of working around it.
 
 ## Tier 1 systems.
 It's very easy to support all the systems in this category because we have
@@ -76,7 +76,7 @@ ultimate authority on it.
 ### [Haiku](https://git.haiku-os.org/haiku/tree/)
 Browse the headers at [headers/](https://git.haiku-os.org/haiku/tree/headers).
 
-### Mac OS X
+### macOS
 "[These manual pages are a subset of the Mac OS X manual pages](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/index.html#//apple_ref/doc/uid/TP40007259)".
 [keith/xcode-man-pages](https://keith.github.io/xcode-man-pages/).
 
@@ -87,7 +87,7 @@ system API and runtimes, for instance neither ucrt nor msvcrt implement
 kludging than Windows' and the project provides export libraries Microsoft
 doesn't like advapi32.def. Thus, Microsoft's documentation is not strictly
 correct when used for understanding Mingw. For instance, Microsoft's
-RtlGenRandom documentation tells us to use the runtime loader to access the
+`RtlGenRandom` documentation tells us to use the runtime loader to access the
 function, but Mingw's advapi32.def allows us to link against the library that
 contains it at compile time.
 
@@ -115,16 +115,17 @@ options](https://docs.microsoft.com/en-us/cpp/build/reference/compiler-options-l
 I can't find MSVCRT documentation. It's best to browse MinGW headers and then
 trial and error the build in that case.
 
-[Using __declspec(dllimport).](https://docs.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport)
-[CRT functions not supported in Universal Windows Platform apps.](https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps)
+[Using __declspec(dllimport)](https://docs.microsoft.com/en-us/cpp/build/importing-into-an-application-using-declspec-dllimport).
+[CRT functions not supported in Universal Windows Platform apps](https://learn.microsoft.com/en-us/cpp/cppcx/crt-functions-not-supported-in-universal-windows-platform-apps).
 It seems some functions like `RtlGenRandom()` have UWP availability listed in the
 function's page, while others like `chdir()` have it in that page.
 
-The oldest supported Windows version is Windows 7 for a variety of reasons.
-When making Windows syscalls, check that they're supported by Windows 7, and
-that they're available both in "Desktop apps" and "UWP apps". The Microsoft
-documentation can be wrong here, for instance, `SecureZeroMemory()` is allowed
-in "UWP apps," but the documentation doesn't state this.
+The oldest supported Windows version is Windows 7 which is the oldest supported
+by Visual Studio. When making Windows syscalls, check that they're supported by
+Windows 7, and that they're available both in "Desktop apps" and "UWP apps".
+The Microsoft documentation can be wrong here, for instance,
+`SecureZeroMemory()` is allowed in "UWP apps," but the documentation doesn't
+state this.
 
 ## Tier 2 systems
 I was unable to get working CI for these systems, but libobsd intends to work
