@@ -111,6 +111,8 @@ libobsd_dep = declare_dependency(link_with: libobsd,
                                  include_directories: incdir,
                                  sources: gen_inc,
                                  compile_args: user_args)
+meson.override_dependency('libbsd-overlay', libobsd_dep)
+meson.override_dependency('libobsd', libobsd_dep)
 
 subdir('test')
 
