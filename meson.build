@@ -14,7 +14,8 @@
 
 project('libobsd', 'c', 'cpp', version: '1.1.1',
         license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
-        default_options: ['c_std=gnu99', 'warning_level=2', 'b_lto=true'])
+        default_options: ['c_std=gnu99,c99', 'warning_level=2', 'b_lto=true'],
+        meson_version: '>=1.3.0')
 
 args = []
 deps = []
