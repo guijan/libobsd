@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022, 2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -105,21 +105,51 @@ libobsd = library('obsd', src,
                   dependencies: deps,
                   gnu_symbol_visibility: 'hidden',
                   override_options: link)
-if subproj
-  if windows_host
-    custom_target('license',
-                  command: ['unix2dos'],
-                  input: 'LICENSE.txt',
-                  feed: true,
-                  output: 'LICENSE_libobsd.txt',
-                  capture: true,
-                  build_by_default: true)
-  else
-    configure_file(input: 'LICENSE.txt',
-                   output: 'LICENSE_libobsd.txt',
-                   copy: true)
-  endif
-else
+
+libobsd_dep = declare_dependency(link_with: libobsd,
+                                 dependencies: deps,
+                                 include_directories: incdir,
+                                 sources: gen_inc,
+                                 compile_args: user_args)
+
+subdir('test')
+
+### Installation. Headers and the library are handled elsewhere.
+
+libobsd_license = 'LICENSE.txt'
+libobsd_readme = 'README.md'
+docdir = get_option('docdir')
+if docdir == ''
+  docdir = get_option('datadir') / 'doc' \
+           / meson.project_name() + '-' + meson.project_version()
+endif
+if windows_host
+  unix2dos = find_program('unix2dos')
+  custom_target('license',
+                command: [unix2dos],
+                input: libobsd_license,
+                feed: true,
+                capture: true,
+                output: subproj ? 'LICENSE_libobsd.txt' : libobsd_license,
+                build_by_default: true,
+                install: not subproj,
+                install_dir: docdir)
+  custom_target('readme',
+                command: [unix2dos],
+                input: libobsd_readme,
+                feed: true,
+                capture: true,
+                output: libobsd_readme,
+                build_by_default: true,
+                install: not subproj,
+                install_dir: docdir)
+elif not subproj
+    install_data(libobsd_license, libobsd_readme,
+                 install_dir: docdir,
+                 install_tag: 'doc')
+endif
+
+if not subproj
   install_man(man)
 
   pkg = import('pkgconfig')
@@ -143,10 +173,3 @@ else
                     pointing_to: 'libobsd.pc')
   endif
 endif
-
-libobsd_dep = declare_dependency(link_with: libobsd,
-                                 dependencies: deps,
-                                 include_directories: incdir,
-                                 sources: gen_inc,
-                                 compile_args: user_args)
-subdir('test')

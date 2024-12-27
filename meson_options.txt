@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022,2024 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -14,8 +14,12 @@
 
 option('provide_libbsd', type: 'boolean', value: false,
        description: 'Provide a libbsd-overlay.pc pkg-config definition.')
+option('docdir', type: 'string',
+       description: 'Where to install the license, readme, and other'
+       + ' documentation which isn\'t man pages.')
 
 # This option is for development, not end users.
 option('test_system', type: 'boolean', value: false,
-       description: 'Creates a Meson test suite named \'system\' which contains'
-                    + ' tests for functions present in the current system.')
+       description: 'Creates a Meson test suite named \'system\' which'
+                    + ' contains tests for functions present in the current'
+                    + ' system.')

@@ -180,7 +180,8 @@ jobs:
         with:
           msystem: ${{matrix.sys}}
           path-type: strict
-          pacboy: gcc:p meson:p ninja:p
+          pacboy: |
+            gcc:p meson:p ninja:p dos2unix:
       - uses: actions/checkout@v4.2.2
       - name: build
         run: |
