@@ -43,13 +43,13 @@ jobs:
   dietlibc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v5.3.0
       - name: setup
         run: |
           pip install meson ninja
           sudo apt update
           sudo apt install -y dietlibc-dev valgrind linux-headers-generic
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: build
         run: |
           CC='diet gcc' meson setup -Dtest_system=true \
@@ -59,7 +59,7 @@ jobs:
         run: meson test --wrapper valgrind --no-suite system -C build
       - name: test_system
         run: meson test --wrapper valgrind --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-dietlibc
@@ -72,7 +72,7 @@ jobs:
         run: |
           brew update
           brew install meson samurai emscripten
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: build
         run: |
           meson setup -Ddefault_library=static -Dtest_system=true \
@@ -82,7 +82,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-emscripten
@@ -91,13 +91,13 @@ jobs:
   glibc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v5.3.0
       - name: setup
         run: |
           pip install meson ninja
           sudo apt update
           sudo apt install -y libasan6
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: build
         run: |
           meson setup -Db_sanitize=address,undefined -Dtest_system=true build
@@ -106,7 +106,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-glibc
@@ -139,7 +139,7 @@ jobs:
         if: always()
         run: |
           vmshell tar -cf - build/meson-logs | tar -xf -
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-haiku
@@ -151,7 +151,7 @@ jobs:
       - run: |
           brew update
           brew install meson samurai
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: build
         run: |
           meson setup -Db_sanitize=address,undefined -Dtest_system=true build
@@ -160,7 +160,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-macos
@@ -181,7 +181,7 @@ jobs:
           msystem: ${{matrix.sys}}
           path-type: strict
           pacboy: gcc:p meson:p ninja:p
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: build
         run: |
           # LTO breaks msys (other environments seem to work): 
@@ -193,7 +193,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-${{matrix.sys}}
@@ -202,19 +202,19 @@ jobs:
   netbsd:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - name: test on NetBSD
-        uses: cross-platform-actions/action@v0.10.0
+        uses: cross-platform-actions/action@v0.26.0
         with:
           operating_system: netbsd
-          version: '9.2'
+          version: '10.0'
           run: |
             sudo pkgin -y install meson
             meson setup -Dtest_system=true build
             meson compile -C build
             meson test --no-suite system -C build
             meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-netbsd
@@ -226,9 +226,9 @@ jobs:
       matrix:
         cc: [cl, clang-cl]
     steps:
-      - uses: actions/setup-python@v4.5.0
+      - uses: actions/setup-python@v5.3.0
       - run: pip install meson ninja
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.2.2
       - uses: ilammy/msvc-dev-cmd@v1.13.0
       - name: build
         run: |
@@ -243,7 +243,7 @@ jobs:
         run: meson test --no-suite system -C build
       - name: test_system
         run: meson test --suite system -C build || true
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-vs-${{matrix.cc}}

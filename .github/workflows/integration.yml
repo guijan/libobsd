@@ -32,8 +32,8 @@ jobs:
           path-type: strict
           pacboy: |
             gcc:p meson:p ninja:p pkgconf:p groff: dos2unix:
-      - uses: actions/checkout@v3.3.0 # checkout libobsd
-      - uses: actions/checkout@v3.3.0 # checkout dictpw
+      - uses: actions/checkout@v4.2.2 # checkout libobsd
+      - uses: actions/checkout@v4.2.2 # checkout dictpw
         with:
           repository: guijan/dictpw
           path: dictpw
@@ -48,7 +48,7 @@ jobs:
           cd dictpw
           meson setup build -Db_lto=false --wrap-mode=nofallback
           meson compile -C build
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
           name: meson-logs-int-${{matrix.sys}}-${{matrix.link}}
