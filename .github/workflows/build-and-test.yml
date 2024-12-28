@@ -188,7 +188,7 @@ jobs:
           # LTO breaks msys (other environments seem to work): 
           # https://github.com/msys2/MINGW-packages/issues/11706
           # contributor says "not really production ready on windows"
-          meson setup -Db_lto=false -Dtest_system=true build
+          meson setup -Dtest_system=true build
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
