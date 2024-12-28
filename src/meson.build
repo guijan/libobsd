@@ -13,7 +13,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 header_generator = executable('header_generator', 'header_generator.c',
-                              c_args: args, native: true)
+                              native: true)
 
 subdir('err')
 subdir('queue')
