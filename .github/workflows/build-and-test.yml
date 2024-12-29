@@ -226,26 +226,47 @@ jobs:
     strategy:
       matrix:
         cc: [cl, clang-cl]
+        arch: [ARM64, x64]
     steps:
       - uses: actions/setup-python@v5.3.0
-      - run: pip install meson ninja
+      - run: |
+          pip install meson
+          choco install ninja -y
       - uses: actions/checkout@v4.2.2
-      - uses: ilammy/msvc-dev-cmd@v1.13.0
+      - name: Enable ARM64 Developer Command Prompt
+        if: matrix.arch == 'ARM64'
+        uses: ilammy/msvc-dev-cmd@v1.13.0
+        with:
+          arch: amd64_arm64
+      - name: Enable x64 Developer Command Prompt
+        if: matrix.arch == 'x64'
+        uses: ilammy/msvc-dev-cmd@v1.13.0
       - name: build
         run: |
-          pwsh -c { 
-            $env:CC="${{ matrix.cc }}"; 
-            # Don't do debug builds because that triggers a Windows bug:
-            # https://developercommunity.visualstudio.com/t/_setmaxstdio-hangs-the-program-if-the/10164855?space=62&q=setmaxstdio&viewtype=all
-            meson setup build --buildtype=release -Dtest_system=true
+          if ("${{matrix.arch}}" -eq 'ARM64') {
+            $buildcc = "--native-file=.github/workflows/meson-vs-gcc.txt"
+            $hostarch = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
+            $hostcc = `
+              "--cross-file=.github/workflows/meson-vs-${{matrix.cc}}.txt"
+            # clang-cl needs extra args to target a particular architecture.
+            $hostcc_args = if (${{matrix.cc}} -eq 'clang-cl') {
+              "--cross-file=.github/workflows/meson-vs-clang-cl-aarch64.txt"
+            }
+          } else {
+            $hostcc = `
+              "--native-file=.github/workflows/meson-vs-${{matrix.cc}}.txt"
           }
+          # Don't do debug builds because that triggers a Windows bug:
+          # https://developercommunity.visualstudio.com/t/_setmaxstdio-hangs-the-program-if-the/10164855?space=62&q=setmaxstdio&viewtype=all
+          meson setup build -Dtest_system=true -Dbuildtype=release `
+            $buildcc $hostarch $hostcc $hostcc_args
           meson compile -C build
       - name: test
         run: meson test --no-suite system -C build
-      - name: test_system
-        run: meson test --suite system -C build || true
+      - name: test system
+        run: meson test --suite system -C build
       - uses: actions/upload-artifact@v4.5.0
         if: always()
         with:
-          name: meson-logs-vs-${{matrix.cc}}
+          name: meson-logs-vs-${{matrix.cc}}-${{matrix.arch}}
           path: build/meson-logs
