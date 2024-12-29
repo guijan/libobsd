@@ -20,4 +20,5 @@ Changes in libobsd master:
 - Add C++ support
 - Add timespeccmp(), timespecsub(), and other timeval/timespec macros from
   sys/time.h
-
+- Ensure the license is placed in the build directory before the dependency is
+  done.

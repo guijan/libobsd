@@ -106,50 +106,7 @@ libobsd = library('obsd', src,
                   gnu_symbol_visibility: 'hidden',
                   override_options: link)
 
-libobsd_dep = declare_dependency(link_with: libobsd,
-                                 dependencies: deps,
-                                 include_directories: incdir,
-                                 sources: gen_inc,
-                                 compile_args: user_args)
-meson.override_dependency('libbsd-overlay', libobsd_dep)
-meson.override_dependency('libobsd', libobsd_dep)
-
-subdir('test')
-
 ### Installation. Headers and the library are handled elsewhere.
-
-libobsd_license = 'LICENSE.txt'
-libobsd_readme = 'README.md'
-docdir = get_option('docdir')
-if docdir == ''
-  docdir = get_option('datadir') / 'doc' \
-           / meson.project_name() + '-' + meson.project_version()
-endif
-if windows_host
-  unix2dos = find_program('unix2dos')
-  custom_target('license',
-                command: [unix2dos],
-                input: libobsd_license,
-                feed: true,
-                capture: true,
-                output: subproj ? 'LICENSE_libobsd.txt' : libobsd_license,
-                build_by_default: true,
-                install: not subproj,
-                install_dir: docdir)
-  custom_target('readme',
-                command: [unix2dos],
-                input: libobsd_readme,
-                feed: true,
-                capture: true,
-                output: libobsd_readme,
-                build_by_default: true,
-                install: not subproj,
-                install_dir: docdir)
-elif not subproj
-    install_data(libobsd_license, libobsd_readme,
-                 install_dir: docdir,
-                 install_tag: 'doc')
-endif
 
 if not subproj
   install_man(man)
@@ -175,3 +132,48 @@ if not subproj
                     pointing_to: 'libobsd.pc')
   endif
 endif
+
+libobsd_license = 'LICENSE.txt'
+libobsd_readme = 'README.md'
+docdir = get_option('docdir')
+if docdir == ''
+  docdir = get_option('datadir') / 'doc' \
+           / meson.project_name() + '-' + meson.project_version()
+endif
+before_libobsd_dep = []
+if windows_host
+  unix2dos = find_program('unix2dos')
+  outname = subproj ? 'LICENSE_libobsd.txt' : libobsd_license
+  before_libobsd_dep += custom_target('license',
+                                      command: [unix2dos],
+                                      input: libobsd_license,
+                                      feed: true,
+                                      capture: true,
+                                      output: outname,
+                                      build_by_default: true,
+                                      install: not subproj,
+                                      install_dir: docdir)
+  custom_target('readme',
+                command: [unix2dos],
+                input: libobsd_readme,
+                feed: true,
+                capture: true,
+                output: libobsd_readme,
+                build_by_default: true,
+                install: not subproj,
+                install_dir: docdir)
+elif not subproj
+    install_data(libobsd_license, libobsd_readme,
+                 install_dir: docdir,
+                 install_tag: 'doc')
+endif
+
+libobsd_dep = declare_dependency(link_with: libobsd,
+                                 dependencies: deps,
+                                 include_directories: incdir,
+                                 sources: before_libobsd_dep + gen_inc,
+                                 compile_args: user_args)
+meson.override_dependency('libbsd-overlay', libobsd_dep)
+meson.override_dependency('libobsd', libobsd_dep)
+
+subdir('test')
