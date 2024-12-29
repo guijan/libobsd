@@ -22,3 +22,9 @@ Changes in libobsd master:
   sys/time.h
 - Ensure the license is placed in the build directory before the dependency is
   done.
+- Explicitly set the minmum Meson version to 1.3.0
+- Install readme and license
+- Override libobsd and libbsd-overlay in Meson
+- Don't force LTO
+- Fix cross compilation when the host machine compiler has MSVC syntax and the
+  buld machine compiler doesn't
