@@ -69,9 +69,7 @@ if cc.get_argument_syntax() == 'msvc'
   args += '-D_CRT_SECURE_NO_WARNINGS'
 endif
 # Spectre mitigations are off by default under MSVC for some ungodly reason.
-if cc.get_id() == 'msvc'
-  args += '/Qspectre'
-endif
+args += cc.get_supported_arguments('/Qspectre')
 
 subproj = meson.is_subproject()
 
