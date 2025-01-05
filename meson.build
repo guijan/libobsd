@@ -131,39 +131,44 @@ if not subproj
   endif
 endif
 
-libobsd_license = 'LICENSE.txt'
-libobsd_readme = 'README.md'
+fs = import('fs')
+before_libobsd_dep = []
+license = files('LICENSE.txt')
+license_subproj = 'LICENSE_libobsd.txt'
+readme = files('README.md')
 docdir = get_option('docdir')
 if docdir == ''
-  docdir = get_option('datadir') / 'doc' \
-           / meson.project_name() + '-' + meson.project_version()
+  docdir = get_option('datadir') / 'doc'
 endif
-before_libobsd_dep = []
+docdir = docdir / meson.project_name() + '-' + meson.project_version()
 if windows_host
   unix2dos = find_program('unix2dos')
-  outname = subproj ? 'LICENSE_libobsd.txt' : libobsd_license
-  before_libobsd_dep += custom_target('license',
-                                      command: [unix2dos],
-                                      input: libobsd_license,
-                                      feed: true,
-                                      capture: true,
-                                      output: outname,
-                                      build_by_default: true,
-                                      install: not subproj,
-                                      install_dir: docdir)
-  custom_target('readme',
-                command: [unix2dos],
-                input: libobsd_readme,
-                feed: true,
-                capture: true,
-                output: libobsd_readme,
-                build_by_default: true,
-                install: not subproj,
-                install_dir: docdir)
-elif not subproj
-    install_data(libobsd_license, libobsd_readme,
-                 install_dir: docdir,
-                 install_tag: 'doc')
+  license_outname = subproj ? fs.name(license) : license_subproj
+  license_tgt = custom_target('license',
+                              command: [unix2dos],
+                              input: license,
+                              output: license_outname,
+                              feed: true,
+                              capture: true,
+                              build_by_default: true,
+                              install: not subproj,
+                              install_dir: docdir,
+                              install_tag: 'doc')
+  before_libobsd_dep += license_tgt
+  readme_tgt = custom_target('readme',
+                             command: [unix2dos],
+                             input: readme,
+                             output: fs.name(readme),
+                             feed: true,
+                             capture: true,
+                             build_by_default: true,
+                             install: not subproj,
+                             install_dir: docdir,
+                             install_tag: 'doc')
+elif subproj
+  before_libobsd_dep += fs.copyfile(license, license_subproj)
+else
+  install_data(license, readme, install_dir: docdir, install_tag: 'doc')
 endif
 
 libobsd_dep = declare_dependency(link_with: libobsd,
