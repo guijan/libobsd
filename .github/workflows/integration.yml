@@ -42,6 +42,10 @@ jobs:
           # Meson's default destdir on MSYS isn't in pkgconf's default search 
           # path.
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
+          inno="$(cmd //c 'echo %ProgramFiles(x86)%')\\Inno Setup 6\\"
+          inno="$(cygpath -u "$inno")"
+          PATH="${PATH}:${inno}"
+          echo "$PATH"
           meson setup build -Db_lto=false -Dprovide_libbsd=true \
             -Ddefault_library=${{matrix.link}}
           meson install -C build
