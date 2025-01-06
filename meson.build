@@ -12,7 +12,7 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-project('libobsd', 'c', 'cpp', version: '1.1.1',
+project('libobsd', 'c', 'cpp', version: '1.2.0',
         license: 'ISC AND BSD-2-Clause AND BSD-3-Clause',
         default_options: ['c_std=gnu99,c99', 'warning_level=2'],
         meson_version: '>=1.3.0')
@@ -102,7 +102,8 @@ libobsd = library('obsd', src,
                   implicit_include_directories: false,
                   dependencies: deps,
                   gnu_symbol_visibility: 'hidden',
-                  override_options: link)
+                  override_options: link,
+                  version: meson.project_version())
 
 ### Installation. Headers and the library are handled elsewhere.
 
