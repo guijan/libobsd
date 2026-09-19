@@ -56,6 +56,9 @@ working CI for them.
 ### [dietlibc](https://www.fefe.de/dietlibc/)
 Download the latest stable and check out the _include/_ subdirectory.
 
+### [DragonflyBSD](https://gitweb.dragonflybsd.org/dragonfly.git/tree)
+[On-Line Manual Pages](https://leaf.dragonflybsd.org/cgi/web-man).
+
 ### [Emscripten](https://github.com/emscripten-core/emscripten)
 Look at the emscripten headers at
 [system/include/](https://github.com/emscripten-core/emscripten/tree/main/system/include),
@@ -75,6 +78,9 @@ ultimate authority on it.
 
 ### [Haiku](https://git.haiku-os.org/haiku/tree/)
 Browse the headers at [headers/](https://git.haiku-os.org/haiku/tree/headers).
+
+### [Illumos](https://github.com/illumos/illumos-gate)
+Browse the [man pages](https://illumos.org/man).
 
 ### macOS
 "[These manual pages are a subset of the Mac OS X manual pages](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/index.html#//apple_ref/doc/uid/TP40007259)".
@@ -130,12 +136,6 @@ state this.
 ## Tier 2 systems
 I was unable to get working CI for these systems, but libobsd intends to work
 with them.
-
-### [DragonflyBSD](https://gitweb.dragonflybsd.org/dragonfly.git/tree)
-[On-Line Manual Pages](https://leaf.dragonflybsd.org/cgi/web-man).
-
-### [Illumos](https://github.com/illumos/illumos-gate)
-Browse the [man pages](https://illumos.org/man).
 
 ### [uclibc-ng](https://gogs.waldemar-brodkorb.de/oss/uclibc-ng)
 Browse the headers at
