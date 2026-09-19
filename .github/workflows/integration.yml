@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2025 Guilherme Janczak <guilherme.janczak@yandex.com>
+# Copyright (c) 2022-2026 Guilherme Janczak <guilherme.janczak@yandex.com>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -44,7 +44,7 @@ jobs:
           # Meson's default destdir on MSYS isn't in pkgconf's default search 
           # path.
           export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
-          inno="$(cmd //c 'echo %LocalAppData%')\\Programs\\Inno Setup 6\\"
+          inno="$(cmd //c 'echo %ProgramFiles(x86)%')\\Inno Setup 6\\"
           inno="$(cygpath -u "$inno")"
           PATH="${PATH}:${inno}"
           echo "$PATH"
