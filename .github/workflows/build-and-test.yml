@@ -287,13 +287,13 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1.13.0
       - name: build
         run: |
-          if ("${{matrix.arch}}" -eq 'ARM64') {
+          if ("${{matrix.arch}}" -eq "ARM64") {
             $buildcc = "--native-file=.github/workflows/meson-vs-gcc.txt"
             $hostarch = "--cross-file=.github/workflows/meson-vs-aarch64.txt"
             $hostcc = `
               "--cross-file=.github/workflows/meson-vs-${{matrix.cc}}.txt"
             # clang-cl needs extra args to target a particular architecture.
-            $hostcc_args = if (${{matrix.cc}} -eq 'clang-cl') {
+            $hostcc_args = if ("${{matrix.cc}}" -eq 'clang-cl') {
               "--cross-file=.github/workflows/meson-vs-clang-cl-aarch64.txt"
             }
           } else {
